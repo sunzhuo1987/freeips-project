@@ -1,0 +1,1 @@
+alert tcp $EXTERNAL_NET any -> $HOME_NET any (msg:"MISC UPnP Location overflow"; seq:0;  sid:1388; rev:14;)

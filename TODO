@@ -1,0 +1,43 @@
+
+Todo
+----
+
+- MAJOR: If drop privileges is chosen, do a permission check on files and folders that need access
+	 so a decent error message can be given
+- MAJOR: add some of the easy Snort keywords support (like seq, window, etc)
+- MAJOR: move HTTP processing from uricontent, this should not be signature dependent, in fact the
+         HTTP processor should enrich the traffic struct with HTTP protocol information that can be used
+         in signature matching. urilen is not supported either
+- MAJOR: HTTP normalization for uricontent (e.g. %41 = .)
+
+- MINOR: Signature management, start by sorting the signatures so that the ones with most matches are the ones
+	 first tested.. (already prepared in linked list, just not used yet) 
+
+- MINOR: Protocol recognition, starting with HTTP, configurable (turn on and off). For this there should be a model
+  that supported packet peaking ;p   It can then also be used for trending alerts, port scan alerts , etc etc
+  also cool would be a HTTP request and response monitor. Where you can say: if 9 out of 10 HTTP requests are
+  answered by the server with a 403 error then block the client...  also this approach allows p0f fingerprinting
+  to also enrich traffic info
+
+- MINOR: add a delay option to TCP_STRICT.. this allows the session table to fill with existing connections
+         during the delay.. once the delay passed, tcp strict becomes effective and any packets that do not
+         belong to a known session are dropped.. ofcourse, not if its a SYN for a new connection ;p
+
+- Implement support of multiple analyzers to take advantage of SMP
+- Get rid of strdup's
+- Reloading of signatures: freeMem the allocated content strings (and uricontent)
+- amount of packets
+- detect_hooks: add protocol check in the options function and prevent loading if the protocol is not OK
+
+
+
+
+Done:
+-----
+
+- MAJOR: merge string comparison from uricontent and content 
+- MAJOR: Add authentication to control thread
+- MAJOR: Instead of sequentially testing hooks, first do the ones which are less CPU intensive so if
+         they fail we dont't have to do the CPU intensive ones, thus less delay
+- MINOR: Array of FD's to be closed upon shutdown
+- Control HTTP thread on a specific IP

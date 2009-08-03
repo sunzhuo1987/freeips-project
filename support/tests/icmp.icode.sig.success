@@ -1,0 +1,1 @@
+alert icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"ICMP icode test"; icode:0;  sid:1388; rev:14;)

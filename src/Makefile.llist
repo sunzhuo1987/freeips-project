@@ -1,0 +1,43 @@
+LIBS=
+CC=gcc
+LD=ld
+CFLAGS=	-Wall
+LDFLAGS=-shared
+SRCS=list.c memory.c
+TESTS=conmonitor listdebug listsort
+OBJECTS=$(SRCS:.c=.o)
+OUTSHRDLIB=liblinkedlist.so
+OUTSTATLIB=$(OUTSHRDLIB:.so=.a)
+DCFLAGS=-O9 -rdynamic -I. -I ../includes  -I /usr/local/include/
+AR=ar
+
+all:    thread test 
+
+test:
+.for dir in ${TESTS}
+	cd tests/${dir} && make
+.endfor
+
+lib: shared static
+
+shared:
+	${CC} ${CFLAGS} ${DCFLAGS} -c ${SRCS}
+	${LD} -shared  ${OBJECTS} -o ${OUTSHRDLIB}
+
+thread:
+	${CC} ${CFLAGS} -pthread -DWITH_THREAD ${DCFLAGS} -c ${SRCS}
+	${LD} -shared ${OBJECTS} -o ${OUTSHRDLIB}
+
+debug:
+	${CC} ${CFLAGS} -DWITH_DEBUG -pthread -DWITH_THREAD ${DCFLAGS} -c ${SRCS}
+	${LD} -shared ${OBJECTS} -o ${OUTSHRDLIB}
+
+static:
+	${AR} rcs ${OUTSTATLIB} ${OBJECTS}
+
+clean:
+	rm -f *.o *.a tests/*.o tests/*.core *.core *.o *.so
+.for dir in ${TESTS}
+	cd tests/${dir} && make clean
+.endfor
+

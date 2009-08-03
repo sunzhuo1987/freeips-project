@@ -1,0 +1,16 @@
+/bin/csh
+/bin/pax
+/bin/ed
+/bin/dd
+/usr/bin/dig
+/usr/bin/nslookup
+/usr/bin/nsupdate
+/usr/bin/openssl
+/usr/bin/ftp
+/usr/bin/telnet
+/usr/bin/slogin
+/usr/bin/tar
+/usr/bin/cu
+/usr/bin/finger
+/usr/bin/tftp
+/usr/sbin/named
