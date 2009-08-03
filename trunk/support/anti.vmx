@@ -1,0 +1,52 @@
+#!/usr/bin/vmware
+displayName = "FreeBSD"
+guestOS = "freebsd"
+
+memsize = "256"
+ide0:0.fileName = "ANTI.vmdk"
+#ide1:0.fileName = "cdrom.iso"
+
+# DEFAULT SETTINGS UNDER THIS LINE
+config.version = "8"
+virtualHW.version = "3"
+
+MemAllowAutoScaleDown = "FALSE"
+MemTrimRate = "-1"
+
+uuid.location = "56 4d 2c 7e a3 d6 58 b8-51 42 a1 d6 9e 75 c3 16"
+uuid.bios = "56 4d 2c 7e a3 d6 58 b8-51 42 a1 d6 9e 75 c3 16"
+
+uuid.action = "create"
+checkpoint.vmState = "image.vmss"
+
+ethernet0.present = "TRUE"
+ethernet0.connectionType = "nat"
+ethernet0.addressType = "generated"
+ethernet0.generatedAddress = "00:0c:29:75:c3:16"
+ethernet0.generatedAddressOffset = "0"
+
+usb.present = "FALSE"
+sound.present = "FALSE"
+
+scsi0.present = "FALSE"
+scsi0:0.present = "FALSE"
+scsi0:1.present = "FALSE"
+
+floppy0.present = "FALSE"
+
+ide0:1.present = "FALSE"
+ide1:1.present = "FALSE"
+
+ide0:0.present = "TRUE"
+ide0:0.deviceType = "disk"
+ide0:0.startConnected = "TRUE"
+
+ide1:0.present = "FALSE"
+ide1:0.deviceType = "cdrom-image"
+ide1:0.autodetect = "FALSE"
+ide1:0.startConnected = "TRUE"
+
+ide0:0.redo = ""
+
+tools.remindInstall = "FALSE"
+

@@ -1,0 +1,11 @@
+
+
+Divert is pretty easy.. add the following rule to IPFW for diverting
+IPv4 packets to divert port 2222. Then tell ANTI to pick these
+packets up... based on the evaluation and signature "action" packets
+/sessions are passed or dropped.
+
+
+ipfw add 410 divert 2222 ip4 from any to any
+./ANTI -I -P 2222 -S config/
+

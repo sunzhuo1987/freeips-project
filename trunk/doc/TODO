@@ -1,0 +1,11 @@
+- Urgent: add SIGHUP support for reloading the configuration
+- Urgent: add configuration file support (avoid starting up with 100 flags)
+
+
+- Cleanup hash.c and make it more generic (to be used for IP frags and signatures aswell)
+- Move strdups to memory.c so be able to trace it
+- Improve stats.c (add more)
+- Create a model for signature parsing instead of that one huge
+  function
+- Allow pre-processors to be registered
+- Fix the web interface, improve look and flexibility. Add controls

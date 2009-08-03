@@ -1,0 +1,29 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+          ----------------------------------------
+          Welcome to this ANTI IDP vmware image !
+          ----------------------------------------
+
+In vmware, make sure that you have bridged your active interface
+with the vmware interface so that ANTI can actually see some traffic
+
+The following command should probably be get you started. If not
+then have a look at the config.xml file and change the interface name
+
+# cd /usr/local/share/ANTI/
+# ANTI -c config/config.xml
+
+
+
+
