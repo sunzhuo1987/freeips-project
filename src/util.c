@@ -157,7 +157,7 @@ void dumphex(void *data, int size) {
 void usage() {
 	printf("\n\n");
 	printf("\n------------------------------------------------------\n");
-	printf("%s Network Intrusion Detection (version: %s)\n",PROGNAME, VERSION);
+	printf("                     %s (version: %s)\n",PROGNAME, VERSION);
 	printf("------------------------------------------------------\n");
 	printf("\n");
 	printf("Options:\n");
@@ -173,8 +173,8 @@ void usage() {
 	printf("   -P  <divert port> # Divert socket\n");
 	printf("   -I                # Inline mode\n");
 	printf("   -S  <sig file>    # File with signatures\n");
-	printf("   -l <dir>          # Directory for packet dumps\n");
-	printf("   -u <user>         # Run as user\n");
+	printf("   -l  <dir>         # Directory for packet dumps\n");
+	printf("   -u  <user>        # Run as user\n");
 	printf("   -D                # Daemon mode\n");
 	printf("   -T                # Disable strict TCP\n");
 	printf("\n\n");
