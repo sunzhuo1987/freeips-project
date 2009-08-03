@@ -3,7 +3,7 @@
 BSDDIR=/usr/src/tools/tools/tinybsd/
 BINDISK=tinybsd.bin
 RCFILE=rc.local
-VMDISK=ANTI.vmdk
+VMDISK=FreeIPS.vmdk
 SVNSERVER=svn.heinen.ws
 SVNSUBDIR=anti
 SVNCODIR=anti
@@ -11,7 +11,7 @@ HERE=`pwd`
 BUILDDIR=`pwd`/../
 EXCLUDEFILES=delete.files
 RELEASEDIR=${HERE}
-VMXFILE=anti.vmx
+VMXFILE=freeips.vmx
 TMPMNT=/mnt
 
 set -x
@@ -22,7 +22,7 @@ set -x
 
 TIMESTAMP=`date "+%d-%m-%Y"`
 
-function build_anti() {
+function build_freeips() {
 	cd ${BUILDDIR}
 	
 	make clean
@@ -40,10 +40,10 @@ function build_tinybsd() {
 		/bin/rm -f "${BSDDIR}/${BINDISK}" 
 	fi
 
-	cp -R anti/ /usr/src/tools/tools/tinybsd/conf/anti/
+	cp -R freeips/ /usr/src/tools/tools/tinybsd/conf/freeips/
 
 	echo "Starting to build image";
-	/usr/src/tools/tools/tinybsd/tinybsd sectors=128000 heads=8 spt=64 conf=anti batch new
+	/usr/src/tools/tools/tinybsd/tinybsd sectors=128000 heads=8 spt=64 conf=freeips batch new
 
 	if [ ! -f "${BSDDIR}/${BINDISK}" ]
 	then
@@ -121,7 +121,7 @@ function package() {
 #build_tinybsd;
 mount_image;
 clean_image;
-build_anti;
+build_freeips;
 umount_image;
 create_vmware_image;
 cleanup;
