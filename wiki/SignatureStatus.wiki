@@ -3,11 +3,11 @@
 
 = Introduction =
 
-It was chosen to give the IDP support for Snort signatures due to the large support <br>
+It was chosen to give the FreeIPS support for Snort signatures due to the large support <br>
 there is available today for this format.  We do not need to re-invent the wheel and <br>
-anyone familiar with Snort can also work with the ANTI signatures.<br>
+anyone familiar with Snort can also work with the FreeIPS.<br>
 
-In fact, just download ANTI, then download Snort signatures and your good to go.
+In fact, just download FreeIPS, then download some Snort signatures and your good to go.
 
 = Links =
 
@@ -91,7 +91,7 @@ These are related to traffic analysis
 
 == Non-snort signature keywords==
 
-These are ANTI specific and very experimental
+These are FreeIPS specific and very experimental
 
 ||<b>Keyword</b>||<b>Status</b>||<b>Usage</b>||<b>Comment</b>||
 ||latency||<font color="Green">Yes</font>||latency:1; ||Add this amount of latency||
