@@ -1,31 +1,7 @@
 
-I wrote ANTI for fun and with this being the first public release
-you can be sure that things may not work as you expect and some
-things may not work at all.  The lack of any good documentation
-will probably also be... how can I say this..  a bit difficult for
-you to play with this program at all.
-
-Here are some tips to get you started:
-
-*-  Use on FreeBSD only (7.2-STABLE works)
-*-  Compile by typing in this directory: "make"
-*-  You'll need libpcre and libxml2 
-*-  Run from this directory using: ./ANTI -i iwn0 -c config/config.xml
-*-  Check out config/signatures/example.conf 
-*-  Check out all files in src/ 
-*-  Download Snort signatures and load them (90% should load fine)
-*-  For inline mode, check support/divert.sh
-*-  To build a vmware image, check support/vmware.sh
-
-The IDP currently includes one ugly hack (more actually but I'll
-keep the others for myself) which is for the support of the
-Snort 'uricontent' signature keyword which I simply mapped to the
-'content' keyword. As a result, you can expect false positives when
-using such signatures. I may actually fix this... ;-)
-
 Have fun ! Contact me for any questions / suggestions..
 
-http://code.google.com/p/antiips/
+http://code.google.com/p/freeips-project/
 
 niels[at]heinen.ws
 
