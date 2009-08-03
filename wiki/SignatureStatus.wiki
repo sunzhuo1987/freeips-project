@@ -1,0 +1,98 @@
+#summary Describes support status of signatures
+#labels Featured
+
+= Introduction =
+
+It was chosen to give the IDP support for Snort signatures due to the large support <br>
+there is available today for this format.  We do not need to re-invent the wheel and <br>
+anyone familiar with Snort can also work with the ANTI signatures.<br>
+
+In fact, just download ANTI, then download Snort signatures and your good to go.
+
+= Links =
+
+Snort signatures are described in the snort manual<br>
+http://www.snort.org/docs/
+
+Free signatures<br>
+http://www.emergingthreats.net/
+
+= Signature support status =
+
+The table below gives you an indication of how much we actually are compatible with <br>
+the Snort signatures.  Note that eventough the signature keywords are supported, the<br>
+usage and processing in the engine is likely to be different.  However, you can expect<br>
+that in the end the attack detection is the same... 
+
+It should be noted that it's not the goal to support 100% of all signatures. The goal<br> is to be as much compatible as possible without implementing sub-optimal code<br> 
+
+Note: The below lists are based on the 2.8.4 snort user manual
+
+==Payload processing==
+
+These are payload specific
+
+||<b>Keyword</b>||<b>Status</b>||<b>Comment</b>||
+||content||<font color="green">Done</font>|| ||
+||nocase||<font color="green">Done</font>||Content modifier||
+||rawbytes||<font color="red">No</font>||Content modifier||
+||depth||<font color="green">Done</font>||Content modifier||
+||offset||<font color="green">Done</font>||Content modifier||
+||distance||<font color="green">Done</font>||Content modifier||
+||within||<font color="green">Done</font>||Content modifier||
+||http_client_body||<font color="red">No</font>||Planned in HTTP processing||
+||http_cookie||<font color="red">No</font>||Never used?||
+||http_header||<font color="red">No</font>||Never used?||
+||http_method||<font color="red">No</font>||Never used?||
+||http_uri||<font color="red">No</font>||Never used?||
+||fast_pattern||<font color="red">No</font>|| ||
+||uricontent||<font color="Green">Yes</font>|| ||
+||urilen||<font color="Orange">Partially</font>||Work in progress||
+||isdataat||<font color="green">yes</font>|| ||
+||pcre||<font color="green">yes</font>||Snort modifiers need some work||
+||byte_test||<font color="red">No</font>|| ||
+||byte_jump||<font color="red">No</font>|| ||
+||ftpbounce||<font color="red">No</font>|| ||
+||asn1||<font color="red">No</font>|| ||
+||cvs||<font color="red">No</font>|| ||
+||dce_iface||<font color="red">No</font>||very specific||
+||dce_opnum||<font color="red">No</font>||Very specific||
+||dce_stub_data||<font color="red">No</font>||Very specific||
+
+
+==Non-payload processing==
+
+
+These are related to traffic analysis
+
+||<b>Keyword</b>||<b>Status</b>||<b>Comment</b>||
+||fragoffset||<font color="red">No</font>|| ||
+||ttl||<font color="green">Yes</font>|| ||
+||tos||<font color="green">Yes</font>|| ||
+||id||<font color="green">Yes</font>|| ||
+||ipopts||<font color="red">No</font>|| ||
+||fragbits||<font color="red">No</font>|| ||
+||dsize||<font color="green">Yes</font>|| ||
+||flags||<font color="Orange">Yes</font>||Needs a review||
+||flow||<font color="Orange">Yes</font>||Supported are: to_server,to_client,established.||
+||flowbits||<font color="red">No</font>|| ||
+||seq||<font color="Green">Yes</font>|| ||
+||ack||<font color="Green">Yes</font>|| ||
+||window||<font color="red">No</font>|| ||
+||itype||<font color="Green">Yes</font>|| ||
+||icode||<font color="Green">Yes</font>|| ||
+||icmp_id||<font color="red">No</font>|| ||
+||icmp_seq||<font color="red">No</font>|| ||
+||rpc||<font color="red">No</font>|| ||
+||ip_proto||<font color="green">Yes</font>|| ||
+||sameip||<font color="red">No</font>|| ||
+||stream_size||<font color="red">No</font>|| ||
+
+
+== Non-snort signature keywords==
+
+These are ANTI specific and very experimental
+
+||<b>Keyword</b>||<b>Status</b>||<b>Usage</b>||<b>Comment</b>||
+||latency||<font color="Green">Yes</font>||latency:1; ||Add this amount of latency||
+||p0f||<font color="Orange">Yes</font>||p0f; ||Fingerprinting, work in progress||
