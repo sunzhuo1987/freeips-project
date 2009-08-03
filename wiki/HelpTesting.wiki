@@ -1,4 +1,5 @@
 #summary Description on how to help testing
+#labels Featured,Phase-Support
 
 = Introduction =
 
