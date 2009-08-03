@@ -20,7 +20,7 @@
 
 #define MAX_LIST_SIZE 357913
 #define VERSION  "0.1"
-#define PROGNAME "ANTI"
+#define PROGNAME "FreeIPS"
 
 #define TYPE_URICONTENT 1
 #define TYPE_CONTENT 2

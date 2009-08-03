@@ -276,7 +276,7 @@ int handle_connection(int clientfd) {
 
 		if(check_http_auth(readbuf,readbytes,fsock) == 1) {
 			fprintf(fsock,"HTTP/1.0 401 Unauthorized\r\n");
-			fprintf(fsock,"WWW-Authenticate: Basic realm=\"ANTI\"\r\n");
+			fprintf(fsock,"WWW-Authenticate: Basic realm=\"FreeIPS\"\r\n");
 			fprintf(fsock,"Connection: close\r\n\r\n");
 			fflush(fsock);
 			fclose(fsock);

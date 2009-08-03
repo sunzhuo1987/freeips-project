@@ -12,7 +12,7 @@ INCLUDES= -I. -I /usr/local/include/ -I ../includes/
 HASHTEST=testhash.c hash.c
 HOOKS=detect_hooks/*.c
 SRCS= main.c traffic.c timer.c divert.c log.c util.c pcap.c signature.c ip4.c config.c analyze.c stats.c tcp.c hash.c control.c memory.c list.c hooks.c ${HOOKS}
-PROGNAME=ANTI
+PROGNAME=FreeIPS
 
 all:   
 	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} -lpcap
