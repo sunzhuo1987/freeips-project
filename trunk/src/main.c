@@ -154,6 +154,9 @@ int main(int argc, char **argv)  {
 		exit(1);
 	}
 
+	// Make signature index;
+	make_signature_indexes(P_TCP);
+
 	log_info("Loaded signature count: %d", sigcount);
 
 
@@ -211,20 +214,19 @@ int main(int argc, char **argv)  {
 	// Set the time
 	gettimeofday(&startuptime,NULL);
         pthread_create(&t_analyzer,NULL,(void*)pcap_analyzer,NULL);
-        pthread_join(t_listener,NULL);
 
 	if(mode_offline == 1) {
-		sleep(1);
-		loop_analyzer = 0;
 		pthread_join(t_analyzer, NULL);
+	} else {
+		pthread_join(t_listener,NULL);
 	}
-
-        // Free the list.
-        freeList(trafficlist,1);
 
 	// Control thread
 	loop_control = 0;
 	pthread_join(t_control, NULL);
+
+        // Free the list.
+        freeList(trafficlist,1);
 
 	// And bail out
 	dump_stats(stdout);

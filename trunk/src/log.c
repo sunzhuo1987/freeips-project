@@ -88,7 +88,7 @@ void pop_all_messages() {
 
 int pop_message() {
 	Message *msg;
-	char logfile[128];
+	//char logfile[128];
 
 	if((msg = (Message *)popListEntry(logqueue)) == NULL) {
 		return 0;
@@ -97,6 +97,12 @@ int pop_message() {
 	// Check if this is a real alert.. if so then dump
 	// the traffic and free it
 	if(msg->type == LOG_TYPE_ALERT) {
+
+		/*
+
+		This is now broken !!!!
+		Needs to be rewritten anyway
+
 		if(CONFIG_LOG_STDOUT == 1) {
 			if(CONFIG_LOG_VERBOSE > 1) {
 				// Show some more info..
@@ -108,19 +114,19 @@ int pop_message() {
 			}
 		}
 		
-		if(msg->traffic->signature == NULL) {
-			fatal_error("Signature traffic ref = NULL");
-		}
-
-		// Create the log file name
-		if(CONFIG_LOG_PACKET == 1) {
-			snprintf(logfile,128,"%s/%s.%d.dump",CONFIG_LOGDIR,inet_ntoa(msg->traffic->iphdr->ip_dst),msg->traffic->signature->sid);
-			traffic_to_file(logfile,msg->traffic);
+		if(msg->traffic != NULL && msg->traffic->signature != NULL) {
+			// Create the log file name
+			if(CONFIG_LOG_PACKET == 1) {
+				snprintf(logfile,128,"%s/%s.%d.dump",CONFIG_LOGDIR,inet_ntoa(msg->traffic->iphdr->ip_dst),msg->traffic->signature->sid);
+				traffic_to_file(logfile,msg->traffic);
+			}
 		}
 	
 		// Free the memory
-		//freeMem(msg->traffic->data);
-		//freeMem(msg->traffic);
+		freeMem(msg->traffic->data);
+		freeMem(msg->traffic);
+
+		*/
 	}
 
 	do_log(msg);

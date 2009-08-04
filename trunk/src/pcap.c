@@ -30,6 +30,8 @@
 
 // From main.h
 extern struct linked_list *trafficlist;
+extern int loop_sniffer;
+
 
 //
 // Little wrapper to put the loop routine in a thread
@@ -42,6 +44,8 @@ void pcap_listen_loop(void *handle) {
 	// Start sniffing
         pcap_loop((pcap_t*)handle,-1,pcap_callback,NULL);
 	log_info("Pcap loop is done reading");
+	loop_sniffer=0;
+
         pthread_exit(0);
 }
 
@@ -54,6 +58,8 @@ void pcap_callback(u_char *burb,const struct pcap_pkthdr* pkthdr,const u_char* p
 
 	// Put the packet in the traffic struct
 	struct traffic * traffic = pcap_to_traffic((void *)packet,pkthdr);
+
+	stats_increase_cnt(CNT_QUEUE_PUSH,1);
 
 	//Check IP fragmentation
 	if(ntohs(traffic->iphdr->ip_off) & IP_MF || ntohs(traffic->iphdr->ip_off) & IP_OFFMASK) {

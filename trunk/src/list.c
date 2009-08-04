@@ -260,7 +260,6 @@ void * popListEntry(struct linked_list* list) {
 void * popListEntryPtr(struct linked_list* list) {
 
         lockList();
-
         // Empty list ?   
         if(list->stop == NULL) {
                 //DEBUG(stderr, "ERROR: popListEntry called on empty list!\n");
@@ -277,11 +276,9 @@ void * popListEntryPtr(struct linked_list* list) {
 		list->ptr = list->ptr->prev;
 	}
 
-	list->ptr->popped++;
 	list->backlog_cnt++;
 	unlockList();
-	return list->ptr->data;
-
+	return list->ptr;
 }
 
 //
@@ -296,12 +293,21 @@ void   cleanListBacklog(void *arg) {
 
 	struct linked_list *list = (struct linked_list *)arg;
 
-	//printf("cleanListBacklog called !\n");
-	//printf("list->backlog_cnt %d > list->backlog_max %d\n",list->backlog_cnt,list->backlog_max);
+	DEBUG(stdout,"cleanListBacklog called !\n");
+	DEBUGF("list->backlog_cnt %d\n",list->backlog_cnt);
+	DEBUGF("list->backlog_max %d\n",list->backlog_max);
+
 	while(list->backlog_cnt > list->backlog_max) {
+
+		if(list->stop != NULL && list->stop->popped == 0) {
+			DEBUG(stdout, "cleanListBacklog: analyzer cannot keep up !");
+			return;
+		}
+
+
 		traffic = popListEntry(list);
 		if(traffic == NULL) { 
-			printf("Wowo traffic = NULL?!\n");
+			DEBUG(stdout, "cleanListBacklog: traffic = NULL?!");
 			return;
 		}
 
@@ -310,7 +316,7 @@ void   cleanListBacklog(void *arg) {
 		list->backlog_cnt--;
 	}
 
-	//printf("Cleaned %d entries\n",cnt);
+	DEBUGF("cleanListBacklog: Cleaned %d entries\n",cnt);
 	return;
 }
 

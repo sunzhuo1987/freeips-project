@@ -26,6 +26,7 @@ unsigned long stat_cnts[MAX_CNTS];
 #define CNT_HASHMAP_COLL	32
 
 #define CNT_SIG_MATCH		40
+#define CNT_SIG_LOADED		41
 
 #define CNT_IP_FRAG		51	
 #define CNT_IP_FRAG_TMOUT	52	
@@ -40,6 +41,9 @@ unsigned long stat_cnts[MAX_CNTS];
 
 #define CNT_SESSION_MISS	80
 #define CNT_SESSION_TOTAL	81
+
+#define CNT_QUEUE_PUSH		90
+#define CNT_QUEUE_POP		91
 
 
 

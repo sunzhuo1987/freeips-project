@@ -30,6 +30,7 @@
 
 extern int loop_analyzer;
 extern int mode_offline;
+extern int loop_sniffer;
 extern struct linked_list *trafficlist;
 
 //
@@ -39,28 +40,38 @@ extern struct linked_list *trafficlist;
 void pcap_analyzer() {
 
         log_info("Analyzer thread started: accepting data");
+	struct list_entry *packet;
+        struct traffic* traffic;
 
         while(loop_analyzer == 1) {
-                struct traffic* traffic = popListEntryPtr(trafficlist);
+
+		packet = popListEntryPtr(trafficlist);
                 // There might be no data
-                if(traffic == NULL) {
+                if(packet == NULL || packet->data == NULL) {
                         //DEBUG(stdout,"No data in memory..\n");
-			//Avoid CPU hogging 
+                        //Avoid CPU hogging
                         usleep(10000);
                         pthread_yield();
 
-			//If offline modes, we reached EOF
-			if(mode_offline == 1) {
-				loop_analyzer=0;
-			}
+                        //If offline modes, we reached EOF
+                        if(mode_offline == 1 && loop_sniffer == 0) {
+				DEBUG(stdout, "EOF? Analyzer will stop!\n");
+                                loop_analyzer=0;
+                        }
                 } else {
-                        traffic_analyzer(traffic,NULL);
+			stats_increase_cnt(CNT_QUEUE_POP,1);
+
+			traffic = (struct traffic*)packet->data;
+                        traffic_analyzer(traffic,packet);
                 }
         }
+
+	DEBUG(stdout,"Analyzer thread is finished\n");
         pthread_exit(0);
 }
 
-int traffic_analyzer(void *data,struct list_entry *entry) {
+
+int traffic_analyzer(void *data,struct list_entry *packet) {
         struct traffic *traffic = (struct traffic *)data;
         struct signature* sig = NULL;
 	int offset  = 0;
@@ -164,6 +175,7 @@ int traffic_analyzer(void *data,struct list_entry *entry) {
 			divert_inject(traffic);
 		}
 
+		packet->popped = 1;
                 alert(sig,traffic);
 
 	} else {
@@ -173,7 +185,7 @@ int traffic_analyzer(void *data,struct list_entry *entry) {
 			divert_inject(traffic);
 		}
 
-		//traffic_free(traffic);
+		packet->popped = 1;
 	}
 
         return 0;

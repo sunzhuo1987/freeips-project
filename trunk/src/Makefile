@@ -19,6 +19,7 @@ all:
 pcap:
 	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} 
 debug:   
+	#${CC} -g -ggdb ${LIBS} ${INCLUDES} ${LIBDIRS} ${CFLAGS} -o ${PROGNAME} ${SRCS}
 	${CC} -g -ggdb -DWITH_DEBUG -DTCP_SESSION_DEBUG ${LIBS} ${INCLUDES} ${LIBDIRS} ${CFLAGS} -o ${PROGNAME} ${SRCS}
 
 clean:

@@ -21,9 +21,6 @@
 #define MAX_PATH     1024
 #define SIG_ARRAY_SIZE 60
 
-struct linked_list *siglist;
-struct linked_list *sigarray[SIG_ARRAY_SIZE];
-
 #define P_UNKNOWN	0
 #define P_ICMP		1
 #define P_TCP		6
@@ -53,6 +50,27 @@ struct linked_list *sigarray[SIG_ARRAY_SIZE];
 #define SIG_ACTION_DROP 1
 #define SIG_ACTION_PASS 2
 #define SIG_MAX_CONTENT 16
+#define SIG_INDEX_SIZE  65535 + 1
+
+struct linked_list *siglist;
+struct linked_list *sigarray[SIG_ARRAY_SIZE];
+
+struct signature *SIG_INDEX_TCP_SRC[SIG_INDEX_SIZE];
+struct signature *SIG_INDEX_TCP_DST[SIG_INDEX_SIZE];
+struct signature *SIG_INDEX_UDP_SRC[SIG_INDEX_SIZE];
+struct signature *SIG_INDEX_UDP_DST[SIG_INDEX_SIZE];
+struct signature *SIG_INDEXES[SIG_ARRAY_SIZE];
+
+
+// Below is needed to support 
+// int options such as !, - and :
+
+struct intvalue {
+	int start;   // e.g. 80 , 80
+	int stop;    // e.g. 80 , 100
+	int range;   // 0
+	int neg;     // !
+};
 
 //
 // It would be great to make this dynamic instead
@@ -72,8 +90,8 @@ struct signature {
         int rev;
         int direction;
         int connection_state;
-        int srcport;
-        int dstport;
+        struct intvalue srcport;
+        struct intvalue dstport;
         int type;
         int hits;
 
@@ -110,22 +128,29 @@ struct signature {
 
 	// Detection hook
         DetectHook *DetectHooks[DETECT_HOOK_MAX_CNT];
+
+	// For linking
+	struct signature *next;
+
 };
+
 
 int load_signatures(char *sigfile);
 struct signature* match_signature(struct traffic* traffic);
 int sigparse (char *string,struct signature *sig);
 int parseOption(char *name, char *val, struct signature *sig);
 char * cleanup_char(char *word);
-void sigparse_defaults(char *string, struct signature *sig);
+int sigparse_defaults(char *string, struct signature *sig);
 void dumpSignature(struct signature *sig);
 int validateSignature(struct signature *sig);
-int parseport(char *token);
+int parseport(char *token, struct intvalue *port);
 struct signature * getSignatureStruct();
 int read_sig_dir(char *dir);
 struct content* get_last_content(struct signature *sig);
 struct uricontent* get_last_uricontent(struct signature *sig);
 int freeSignatures();
+int make_signature_indexes (int proto);
+struct signature* indexed_match_signature(struct traffic* traffic);
 
 
 #endif 
