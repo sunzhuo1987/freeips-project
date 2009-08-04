@@ -63,6 +63,10 @@ void pcap_callback(u_char *burb,const struct pcap_pkthdr* pkthdr,const u_char* p
 
 	//Check IP fragmentation
 	if(ntohs(traffic->iphdr->ip_off) & IP_MF || ntohs(traffic->iphdr->ip_off) & IP_OFFMASK) {
+		// Make sure this traffic is not
+		// free'd without proper processing
+
+		traffic->free = 0;
 		push_ip_frag(traffic);
 		return;
 	} 

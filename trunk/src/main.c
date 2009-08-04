@@ -128,7 +128,7 @@ int main(int argc, char **argv)  {
         // Create the list, this is to store the IP packets in which can then
         // be read by another thread. TODO: add maximum list size
         trafficlist = getNewList();
-	setListSize(MAX_LIST_SIZE,trafficlist);
+	setListSize(CONFIG_MAX_LIST_SIZE,trafficlist);
 
         // Register the destructor
         registerListDestructor(destructor_callback,trafficlist);

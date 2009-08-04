@@ -73,6 +73,7 @@ void divert_listen_loop() {
 
 		//Check IP fragmentation
 		if(ntohs(traf->iphdr->ip_off) & IP_MF || ntohs(traf->iphdr->ip_off) & IP_OFFMASK) {
+			traf->free = 0;
 			push_ip_frag(traf);
 			return;
 		}

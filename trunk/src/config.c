@@ -67,6 +67,7 @@ int init_config() {
 
 	// packet buffer
 	CONFIG_PACKET_BL_BUFFER=1000;
+	CONFIG_MAX_LIST_SIZE=500000;
 	
 	// Control thread
 	CONFIG_CONTROL_HTTP_PORT   = 3491;
@@ -126,16 +127,27 @@ void parse_general (xmlDocPtr doc, xmlNodePtr cur) {
 			strncpy(CONFIG_SIGFILE,(char *)key,CONFIG_MAX_CHAR);
 			xmlFree(key);
 		}
-		if ((!xmlStrcmp(cur->name, (const xmlChar *)"packetbuffer"))) {
+		if ((!xmlStrcmp(cur->name, (const xmlChar *)"packetblbuffer"))) {
 			key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 			number = atoi((char *)key);
 			if(number > 0) {
 				CONFIG_PACKET_BL_BUFFER = number;
 			} else {
-				log_warn("Configuration option for \"packetbuffer\" should greater then 0");
+				log_warn("Configuration option for \"packetblbuffer\" should greater then 0");
 			}
 			xmlFree(key);
 		}
+                if ((!xmlStrcmp(cur->name, (const xmlChar *)"packetbuffer"))) {
+                        key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+                        number = atoi((char *)key);
+                        if(number > 0) {
+                                CONFIG_MAX_LIST_SIZE = number;
+                        } else {
+                                log_warn("Configuration option for \"packetbuffer\" should greater then 0");
+                        }
+                        xmlFree(key);
+                }
+
 		if ((!xmlStrcmp(cur->name, (const xmlChar *)"sigstrict"))) {
 			key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
 			number = atoi((char *)key);

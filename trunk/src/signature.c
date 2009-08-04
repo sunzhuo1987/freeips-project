@@ -816,6 +816,10 @@ struct signature* match_signature(struct traffic* traffic) {
 
 
 	do {
+
+		if(traffic->proto != P_TCP && traffic->proto != P_UDP && traffic->proto != P_ICMP) {
+			printf("Huh: proto %d\n",traffic->proto);
+		}
 		sret = (struct signature*)ret->data;
 		sret->hits++;
 		if(compare_traffic_signature(traffic,sret) == 1) {

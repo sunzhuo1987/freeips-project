@@ -32,6 +32,8 @@ typedef struct traffic {
         long    hashkey;
 	time_t  latency;
 
+	int free;
+
 	// If set to 1 anywhere during processing -> drop packet
 	int drop;
 } Traffic;

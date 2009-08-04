@@ -19,7 +19,7 @@
 #define MAX_SIG_CNT  8192
 #define MAX_SIG_LINE 4096
 #define MAX_PATH     1024
-#define SIG_ARRAY_SIZE 60
+#define SIG_ARRAY_SIZE 256
 
 #define P_UNKNOWN	0
 #define P_ICMP		1
