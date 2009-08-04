@@ -111,6 +111,7 @@ int push_ip_frag(struct traffic* traffic) {
 			// Update error
 			stats_increase_cnt(CNT_IP_ERR,1);
 			log_error("Fragment assembly failed for dst:%s proto: %d",(char*)inet_ntoa(traffic->iphdr->ip_dst), frag->traffic->proto);
+			printf("BB\n");
 			free_frag_queue(frag_queue,1);
 		} else {
 			pthread_yield();

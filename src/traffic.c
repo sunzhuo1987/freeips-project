@@ -102,6 +102,7 @@ struct traffic * pcap_to_traffic(void *packet, const struct pcap_pkthdr* pkthdr)
         traffic->tcphdr    = NULL;
         traffic->udphdr    = NULL;
         traffic->latency   = 0;
+        traffic->free      = 1; // release when possible
         traffic->icmphdr = NULL;
 
 	return traffic;
@@ -192,8 +193,10 @@ int traffic_to_file(char *file, struct traffic *traf) {
 
 void traffic_free(struct traffic *traf) {
 
-	freeMem(traf->data);
-	freeMem(traf);
+	if(traf->free == 1) {
+		freeMem(traf->data);
+		freeMem(traf);
+	}
 
 }
 

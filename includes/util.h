@@ -9,17 +9,6 @@
 #define DEBUGF(a,b)
 #endif
 
-// Set the maximum amount of payloads to be stored in memory.
-// this allows us to restrict memory usage. Set to the highest
-// value possible in order to prevent a performance decrease.
-//
-// In case you want a maximum of 512MB then:
-//
-// 512MB = 536870912 bytes. If your MTU is 1500 then each payload 
-// element will be 1500 bytes max. So 536870912 / 1500 = 357913
-//
-
-#define MAX_LIST_SIZE 357913
 #define VERSION  "0.1"
 #define PROGNAME "FreeIPS"
 

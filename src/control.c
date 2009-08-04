@@ -207,7 +207,7 @@ void control_loop() {
 	struct sockaddr_in gaddr;
 	struct timeval seltimeout;
 	socklen_t sin_size = sizeof(struct sockaddr_in);
-	int sockfd,clientfd;
+	int count,sockfd,clientfd;
 	fd_set sockset;
 
 	if(CONFIG_CONTROL_HTTP_ENABLE == 1) {
@@ -255,7 +255,10 @@ void control_loop() {
 		timer_run();
 
 		// Pop all messages
-		pop_all_messages();
+		count = 0;
+		while(pop_message() != 0 && count++ != 100) {
+			// do nothin..
+		}
 	}
 
 	close(sockfd);

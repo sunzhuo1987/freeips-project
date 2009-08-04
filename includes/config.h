@@ -45,13 +45,21 @@ char CONFIG_CONTROL_HTTP_AUTH_CLEAR[CONFIG_MAX_CHAR]; 	// user:letmein
 char CONFIG_CONTROL_HTTP_AUTH[CONFIG_MAX_CHAR]; 	// base64(user:letmein)
 unsigned long CONFIG_CONTROL_HTTP_IP;			// INADDR_ANY
 
-
 // Timer parameters
-
 int CONFIG_TIMER_STATS;			// default 600
 int CONFIG_TIMER_TCP_CLEANER;		// default 3600
 int CONFIG_TIMER_IPFRAG_CLEANER;	// default 10
 int CONFIG_TIMER_CLEANUPPBUFFER;	// default 10
+
+// Set the maximum amount of payloads to be stored in memory.
+// this allows us to restrict memory usage. Set to the highest
+// value possible in order to prevent a performance decrease.
+//
+// In case you want a maximum of 512MB (aproximately)
+//
+
+int CONFIG_MAX_LIST_SIZE; 
+
 
 // Functions;
 
