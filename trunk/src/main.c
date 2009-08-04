@@ -155,7 +155,7 @@ int main(int argc, char **argv)  {
 	}
 
 	// Make signature index;
-	make_signature_indexes(P_TCP);
+	init_signature_indexes();
 
 	log_info("Loaded signature count: %d", sigcount);
 

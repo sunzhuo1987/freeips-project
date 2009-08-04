@@ -59,7 +59,8 @@ struct signature *SIG_INDEX_TCP_SRC[SIG_INDEX_SIZE];
 struct signature *SIG_INDEX_TCP_DST[SIG_INDEX_SIZE];
 struct signature *SIG_INDEX_UDP_SRC[SIG_INDEX_SIZE];
 struct signature *SIG_INDEX_UDP_DST[SIG_INDEX_SIZE];
-struct signature *SIG_INDEXES[SIG_ARRAY_SIZE];
+struct signature *SIG_INDEXES_SRC[SIG_ARRAY_SIZE];
+struct signature *SIG_INDEXES_DST[SIG_ARRAY_SIZE];
 
 
 // Below is needed to support 
@@ -149,8 +150,10 @@ int read_sig_dir(char *dir);
 struct content* get_last_content(struct signature *sig);
 struct uricontent* get_last_uricontent(struct signature *sig);
 int freeSignatures();
-int make_signature_indexes (int proto);
 struct signature* indexed_match_signature(struct traffic* traffic);
+int make_signature_indexes (int proto, struct signature* src_ptr[], struct signature* dst_ptr[]);
+
+int init_signature_indexes();
 
 
 #endif 

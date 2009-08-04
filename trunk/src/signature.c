@@ -564,26 +564,50 @@ struct uricontent* get_last_uricontent(struct signature *sig) {
 	return last;
 }
 
+//
+//
+// Initialize the index structure
+//
+
+int init_signature_indexes() {
+
+	int i;
+        for(i=0;i<SIG_INDEX_SIZE;i++) {
+                SIG_INDEX_TCP_SRC[i] = NULL;
+                SIG_INDEX_TCP_DST[i] = NULL;
+                SIG_INDEX_UDP_SRC[i] = NULL;
+                SIG_INDEX_UDP_DST[i] = NULL;
+	}
+        for(i=0;i<SIG_ARRAY_SIZE;i++) {
+		SIG_INDEXES_SRC[i] = NULL;
+		SIG_INDEXES_DST[i] = NULL;
+	}
+
+	// Not used yet
+	SIG_INDEXES_SRC[P_TCP] = *SIG_INDEX_TCP_SRC; 
+	SIG_INDEXES_DST[P_TCP] = *SIG_INDEX_TCP_DST;
+	SIG_INDEXES_SRC[P_UDP] = *SIG_INDEX_UDP_SRC; 
+	SIG_INDEXES_DST[P_UDP] = *SIG_INDEX_UDP_DST;
+
+	make_signature_indexes(P_TCP,SIG_INDEX_TCP_SRC,SIG_INDEX_TCP_DST);
+	make_signature_indexes(P_UDP,SIG_INDEX_UDP_SRC,SIG_INDEX_UDP_DST);
+
+	return 0;
+}
+
 // 
 // Function for making TCP and UDP index tables
 // based on port. These are build ON TOP of the
 // signature linked list
 //
 
-int make_signature_indexes (int proto) {
+int make_signature_indexes (int proto, struct signature* src_ptr[], struct signature* dst_ptr[]) {
 
 	struct signature* sret;
 	struct signature* sptr;
 	int i=0;
 
 	log_info("Going to index signatures: proto %d",proto);
-
-	for(i=0;i<SIG_INDEX_SIZE;i++) {
-		SIG_INDEX_TCP_SRC[i] = NULL;
-		SIG_INDEX_TCP_DST[i] = NULL;
-		SIG_INDEX_UDP_SRC[i] = NULL;
-		SIG_INDEX_UDP_DST[i] = NULL;
-	}
 
         if(sigarray[proto] == NULL)
                 return -1;
@@ -601,10 +625,10 @@ int make_signature_indexes (int proto) {
 		if(sret->srcport.range == 1) {
 			// Put references everywhere
 			for(i=sret->srcport.start;i<sret->srcport.stop;i++) {
-				if(SIG_INDEX_TCP_SRC[i] == NULL) {
-					SIG_INDEX_TCP_SRC[i] = sret; 
+				if(src_ptr[i] == NULL) {
+					src_ptr[i] = sret; 
 				} else {
-					sptr = SIG_INDEX_TCP_SRC[i];
+					sptr = src_ptr[i];
 					while(sptr->next != NULL) {
 						sptr = sptr->next;
 					}	
@@ -613,11 +637,11 @@ int make_signature_indexes (int proto) {
 				}
 			}
 		} else if(sret->srcport.range == 0) {
-                        if(SIG_INDEX_TCP_SRC[sret->srcport.start] == NULL) {
-                                SIG_INDEX_TCP_SRC[sret->srcport.start] = sret;
+                        if(src_ptr[sret->srcport.start] == NULL) {
+                                src_ptr[sret->srcport.start] = sret;
                         } else { 
                 
-                                sptr = SIG_INDEX_TCP_SRC[sret->srcport.start];
+                                sptr = src_ptr[sret->srcport.start];
                                 while(sptr->next != NULL) {
                                         sptr = sptr->next;
                                 }
@@ -627,10 +651,10 @@ int make_signature_indexes (int proto) {
 		}	
 
                 if(sret->dstport.range == 0) {
-                        if(SIG_INDEX_TCP_DST[sret->dstport.start] == NULL) {
-                                SIG_INDEX_TCP_DST[sret->dstport.start] = sret;
+                        if(dst_ptr[sret->dstport.start] == NULL) {
+                                dst_ptr[sret->dstport.start] = sret;
                         } else {
-                                sptr = SIG_INDEX_TCP_DST[sret->dstport.start];
+                                sptr = dst_ptr[sret->dstport.start];
                                 while(sptr->next != NULL) {
                                         sptr = sptr->next;
                                 }
@@ -642,10 +666,10 @@ int make_signature_indexes (int proto) {
 
                         // Put references everywhere
                         for(i=sret->dstport.start;i< sret->dstport.stop;i++) {
-                                if(SIG_INDEX_TCP_DST[i] == NULL) {
-                                        SIG_INDEX_TCP_DST[i] = sret;
+                                if(dst_ptr[i] == NULL) {
+                                        dst_ptr[i] = sret;
                                 } else {
-					sptr = SIG_INDEX_TCP_DST[i];
+					sptr = dst_ptr[i];
 					while(sptr->next != NULL) {
 						sptr = sptr->next;
 					}
@@ -743,7 +767,7 @@ struct signature* match_signature(struct traffic* traffic) {
 	if(ret == NULL)
 		return NULL; 
 
-        if(traffic->proto == P_TCP) {
+        if(traffic->proto == P_TCP || traffic->proto == P_UDP) {
 		//printf("Calling indexed\n");
                 if((sret = indexed_match_signature(traffic)) != NULL) {
                         stats_increase_cnt(CNT_SIG_MATCH,1);
@@ -773,15 +797,6 @@ int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
 
 	if(sret->proto != traffic->proto)
 		return 0;
-
-	if(traffic->proto == P_UDP) {
-		if(sret->dstport.range != -1 && sret->srcport.start != htons(traffic->udphdr->uh_sport)) {
-			return 0;
-		}
-		if(sret->dstport.range != -1 && sret->dstport.start != htons(traffic->udphdr->uh_dport)) {
-			return 0;
-		}
-	}
 
 	// Fire off the detection hooks
 	for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
