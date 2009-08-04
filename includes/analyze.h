@@ -3,7 +3,7 @@
 
 //analyzer thread
 void pcap_analyzer();
-int traffic_analyzer(void *data,struct list_entry *entry);
+int traffic_analyzer(void *data,struct list_entry *packet);
 
 
 #endif

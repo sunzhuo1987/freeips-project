@@ -41,7 +41,7 @@ int hook_tcp_ack(struct signature *sig,struct traffic *traffic) {
 
 	//printf("Comparing: %u -> %u\n",myack,sig->ack);
 	if(myack == sig->ack) {
-		printf("Yes match!\n");
+		//printf("Yes match!\n");
 		return 1;
 	}
 

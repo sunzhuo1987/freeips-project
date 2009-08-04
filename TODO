@@ -5,6 +5,7 @@ Todo
 - MAJOR: If drop privileges is chosen, do a permission check on files and folders that need access
 	 so a decent error message can be given
 - MAJOR: add some of the easy Snort keywords support (like seq, window, etc)
+- MAJOR: Sort signatures also on port?? (investigate)
 - MAJOR: move HTTP processing from uricontent, this should not be signature dependent, in fact the
          HTTP processor should enrich the traffic struct with HTTP protocol information that can be used
          in signature matching. urilen is not supported either

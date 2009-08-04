@@ -32,6 +32,7 @@ struct timeval tm_now;
 struct timeval tm_last;
 extern struct linked_list *trafficlist;
 extern struct linked_list *logqueue;
+int lastdata = 0;
 
 extern struct timeval startuptime;
 
@@ -58,15 +59,44 @@ unsigned int stat_get(int id) {
 }
 
 void stats_show_cnt_line() {
-	log_info("STATS: IP:%d (frags: %d) TCP:%d UDP:%d ICMP:%d DATA:%d SIGMATCHES:%d, SESSIONS:%d ALLOC:%d FREE:%d ",stat_get(CNT_IP),stat_get(CNT_IP_FRAG),
-		stat_get(CNT_TCP), stat_get(CNT_UDP), stat_get(CNT_ICMP), stat_get(CNT_IP_DATA_SIZE), stat_get(CNT_SIG_MATCH), stat_get(CNT_SESSION_TOTAL),stat_get(CNT_MEM_ALLOC), stat_get(CNT_MEM_FREE));
+
+	gettimeofday( &tm_now, NULL );
+	int secondsrunning = tm_now.tv_sec - tm_last.tv_sec;
+	int currentdata = stat_get(CNT_IP_DATA_SIZE);
+	char *rname = "Kbps";
+
+	float rate = (((currentdata - lastdata) * 8) / 1024) / secondsrunning;
+
+	if(rate > 1024) {
+		rate = rate/1024;
+		rname = "Mbps";
+	}
+
+	lastdata = currentdata;
+	tm_last.tv_sec = tm_now.tv_sec;
+
+	log_info("STATS #1: Rate:%3.2f %s IP:%d (frags:%d) TCP:%d UDP:%d ICMP:%d Matches:%d Sessions:%d TOTAL DATA:%d",rate, rname,
+					stat_get(CNT_IP),stat_get(CNT_IP_FRAG), stat_get(CNT_TCP), stat_get(CNT_UDP), stat_get(CNT_ICMP), 
+					stat_get(CNT_SIG_MATCH), stat_get(CNT_SESSION_TOTAL),stat_get(CNT_IP_DATA_SIZE)  );
+
+	log_info("STATS #2: Sigs:%d Alloc:%d Free:%d Qpush:%d Qpop:%d ",stat_get(CNT_SIG_LOADED), stat_get(CNT_MEM_ALLOC), 
+					stat_get(CNT_MEM_FREE),stat_get(CNT_QUEUE_PUSH),stat_get(CNT_QUEUE_POP)  );
+
 }
 
 void dump_stats(FILE *fd) {
 
 	gettimeofday( &tm_now, NULL );
 
+	char *rname = "kbps";
 	int secondsrunning = tm_now.tv_sec - startuptime.tv_sec;
+	float rate = ((stat_get(CNT_IP_DATA_SIZE) * 8) / 1024) / secondsrunning;
+
+	if(rate > 1024) {
+		rate = rate/1024;
+		rname = "Mbps";
+	}
+
 
 	fprintf(fd,"\n--------------------------------------\n");
 	fprintf(fd,"            IDS STATISTICS\n");
@@ -83,6 +113,7 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"Sessions cnt   %d (total)\n",stat_get(CNT_SESSION_TOTAL));
 	fprintf(fd,"Total data     %d MB\n",stat_get(CNT_IP_DATA_SIZE) / (1024 * 1024));
 	fprintf(fd,"Sig match      %d\n",stat_get(CNT_SIG_MATCH));
+	fprintf(fd,"Sig count      %d\n",stat_get(CNT_SIG_LOADED));
 	fprintf(fd,"\n");
 	fprintf(fd,"Hash map hits  %d\n",stat_get(CNT_HASHMAP_HITS));
 	fprintf(fd,"Hash map miss  %d\n",stat_get(CNT_HASHMAP_MISS));
@@ -96,11 +127,16 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"Message fatal  %d\n",stat_get(CNT_LOG_TYPE_FATAL));
 	fprintf(fd,"Message warn   %d\n",stat_get(CNT_LOG_TYPE_WARN));
 	fprintf(fd,"\n");
-	fprintf(fd,"Average bytes     %d (p/s)\n",stat_get(CNT_IP_DATA_SIZE) / secondsrunning );
+	fprintf(fd,"Queue push   %d\n",stat_get(CNT_QUEUE_PUSH));
+	fprintf(fd,"Queue pop    %d\n",stat_get(CNT_QUEUE_POP));
+	fprintf(fd,"\n");
+	fprintf(fd,"Average bytes     %3.2f (%s)\n",rate,rname );
 	fprintf(fd,"Average packets   %d (p/s)\n",stat_get(CNT_IP) / secondsrunning );
 	fprintf(fd,"Average sessions  %d (p/s)\n",stat_get(CNT_SESSION_TOTAL) / secondsrunning );
+	fprintf(fd,"Seconds run       %d (versus %d packets)\n", secondsrunning,stat_get(CNT_IP));
 	fprintf(fd,"\n");
 	fprintf(fd,"Pkts not matching session %d (dropped)\n",stat_get(CNT_SESSION_MISS));
 	fprintf(fd,"--------------------------------------\n");
+
 }
 

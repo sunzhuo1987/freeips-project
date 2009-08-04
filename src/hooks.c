@@ -83,7 +83,7 @@ void sort_hooks(struct signature *sig) {
 		if(sig->DetectHooks[count] == NULL || sig->DetectHooks[count + 1] == NULL)
 			break;
 
-		*tmphook = *sig->DetectHooks[count];
+		tmphook = sig->DetectHooks[count];
 
 		if(sig->DetectHooks[count]->prio < sig->DetectHooks[count + 1]->prio) {
 			sig->DetectHooks[count] = sig->DetectHooks[count + 1];

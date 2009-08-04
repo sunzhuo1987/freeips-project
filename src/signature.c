@@ -45,9 +45,7 @@ int load_signatures(char *sigfile) {
 	int i=0,lcount = 0;
 	struct signature *sigstruct;
 
-	// If this is a directory then parse all files in it
-	// this makes it easier to organize the signatures
-
+	// Read dir
 	if(is_dir(sigfile)) {
 		return read_sig_dir(sigfile);
 	}
@@ -65,7 +63,9 @@ int load_signatures(char *sigfile) {
 		return -1;
 	}
 
-	log_verbose("Parsing signature file: %s",sigfile);
+	if(CONFIG_LOG_VERBOSE > 1) {
+		log_verbose("Parsing signature file: %s",sigfile);
+	}
 
 	while(fgets(sigline,MAX_SIG_LINE,fp) != NULL) {
 		ptr = sigline;
@@ -89,7 +89,9 @@ int load_signatures(char *sigfile) {
 		sort_hooks(sigstruct);
 
 		if(validateSignature(sigstruct)) {
-			log_verbose("Invalid signature at line %d: %s",lcount,sigline);
+			if(CONFIG_LOG_VERBOSE > 2) {
+				log_warn("Invalid signature at line %d: %s",lcount,sigline);
+			}
 			freeMem(sigstruct);
 			continue;
 		}
@@ -97,16 +99,16 @@ int load_signatures(char *sigfile) {
 #ifdef TCP_DEBUG_SIGNATURE
 		dumpSignature(sigstruct);
 #endif
+                // Check if we need to initialize the new proto list
+                if(sigstruct->proto < SIG_ARRAY_SIZE && sigarray[sigstruct->proto] == NULL) {
+                        DEBUGF("Initializing signature list for protocol: %d\n",sigstruct->proto);
+                        sigarray[sigstruct->proto] = getNewList();
+                }
 
-		// Check if we need to initialize the new proto list
-		if(sigstruct->proto < SIG_ARRAY_SIZE && sigarray[sigstruct->proto] == NULL) {
-			DEBUGF("Initializing signature list for protocol: %d\n",sigstruct->proto);
-			sigarray[sigstruct->proto] = getNewList();
-		}
-		
-		DEBUGF("Read signature: %s \n",sigstruct->msg);
-		pushListEntry(sigstruct,sigarray[sigstruct->proto]);
-		sigcount++;
+                DEBUGF("Read signature: %s \n",sigstruct->msg);
+                pushListEntry(sigstruct,sigarray[sigstruct->proto]);
+		stats_increase_cnt(CNT_SIG_LOADED,1);
+                sigcount++;
 	}
 
 	return sigcount;
@@ -141,7 +143,7 @@ int read_sig_dir(char *dir) {
 	int scount = 0;
 
 	if ((d = opendir(dir)) == NULL){
-		log_error("Opendir failed ! %s\n", dir);
+		log_error("Opendir failed ! %s", dir);
 		return 0;
 	} 
 	p = readdir(d); // skip .
@@ -158,7 +160,7 @@ int read_sig_dir(char *dir) {
 	return count;
 }
 
-void sigparse_defaults(char *string, struct signature *sig) {
+int sigparse_defaults(char *string, struct signature *sig) {
 
 	char *token, *str;
 	int strcnt = 0;
@@ -183,7 +185,11 @@ void sigparse_defaults(char *string, struct signature *sig) {
 				// from
 				break;
 			case 3:
-				sig->srcport = parseport(token);
+				if(parseport(token,&sig->srcport) != 0) {
+					log_error("Port parsing problem");
+					return 1;
+				}
+				
 				break;
 			case 4:
 				// ->
@@ -192,44 +198,59 @@ void sigparse_defaults(char *string, struct signature *sig) {
 				// to
 				break;
 			case 6:
-				sig->dstport = parseport(token);
+				if(parseport(token,&sig->dstport) != 0) {
+					log_error("Port parsing problem");
+					return 1;
+				}
 				break;
 		}
 	}
 
 	//free the duplicated string
 	free(str);
+	return 0;
 }
 
-int parseport(char *token) {
-	int notflag = 0;
-	int ret;
+int parseport(char *token, struct intvalue *port) {
 
 	if(token[0] == '!') {
-		notflag = 1;
+		port->neg = 1;
 		(*token)++;
 	}
 
 	if(strcmp(token,"any") == 0) {
-		ret = -1;
+		port->start = 0;
+		port->stop  = 65535;
+		port->range = -1;
+		return 0;
 	} else if(strcmp(token,"$HTTP_PORTS") == 0) {
-		ret = 80;
+		port->start = 80;
+		port->stop  = 80;
+		port->range = 0;
 	} else if(strcmp(token,"$SSH_PORTS") == 0) {
-		ret = 22;
+		port->start = 22;
+		port->stop  = 22;
+		port->range = 0;
 	} else if(strcmp(token,"$HTTPS_PORTS") == 0) {
-		ret = 443;
+		port->start = 443;
+		port->stop  = 443;
+		port->range = 0;
 	} else if(index(token,HEX_VAL_COL) != NULL) {
 		//Todo
-		ret = -1;
+		port->start = 0;
+		port->stop  = 65535;
+		port->range = -1;
 	} else {
-		ret = atoi(token);
+		port->start = atoi(token);
+		port->stop  = port->start;
+		port->range = 0;
 	}
 
 	// Todo better port validating
-	if(ret > 65535 || ret < -1) 
-		log_error("Invalid port: %d",ret);
-
-	return ret;
+	if(port->start > 65535 || port->start < 0) {
+		return -1;
+	}
+	return 0;
 }
 
 // Parse the rule and initialize the signature struct
@@ -248,7 +269,9 @@ int sigparse (char *string,struct signature *sig) {
 	sig->popts = NULL;
 
 	// Parse the first part of the line
-	sigparse_defaults(string,sig);
+	if(sigparse_defaults(string,sig) != 0) {
+		return 1;
+	}
 
         // Go to the start.
         if((ptr = index(string,HEX_VAL_BRACKET)) == NULL) {
@@ -331,7 +354,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 
         if(strncmp(name,"nocase",6) == 0) {
 		if(sig->popts == NULL) {
-			log_error("Found nocase without (uri)content first\n");
+			log_error("Found nocase without (uri)content first");
 			return 1;
 		}
                 sig->popts->nocase = 1;
@@ -356,7 +379,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 			// Link the detection hook
 			if((hook = detect_hook_link(sig,name)) != NULL) {
 				if(hook->hook_parse_option(name,cleanup_char(val),sig) == 1) {
-					log_error("Signature parsing error: %s (%s)\n",sig->msg,name);
+					log_error("Signature parsing error: %s (%s)",sig->msg,name);
 					return 1;
 				}
 
@@ -414,12 +437,12 @@ int parseOption(char *name, char *val, struct signature *sig) {
 
         if(strncmp(name,"depth",5) == 0) {
 		if(sig->popts == NULL) {
-			log_error("Found depth keyword without (uri)content first\n");
+			log_error("Found depth keyword without (uri)content first");
 			return 1;
 		}
 	
 		if(sig->popts->depth != -1) {
-			log_error("Found second depth for (uri)content?!\n");
+			log_error("Found second depth for (uri)content?!");
 			return 1;
 		}
 
@@ -437,7 +460,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 		}
 
 		if (sig->popts == NULL) {
-			log_error("Found isdataat without (uri)content first \n");
+			log_error("Found isdataat without (uri)content first");
 			return 1;
 		}
 
@@ -452,13 +475,13 @@ int parseOption(char *name, char *val, struct signature *sig) {
 
         if(strncmp(name,"offset",6) == 0) {
 		if(sig->popts == NULL) {
-			log_error("Found offset keyword without (uri)content first\n");
+			log_error("Found offset keyword without (uri)content first");
 			return 1;
 		}
 
 		// Check if already initialized
 		if(sig->popts->offset != -1) {
-			log_error("Found second offset for (uri)content?!\n");
+			log_error("Found second offset for (uri)content?!");
 			return 1;
 		}
                 sig->popts->offset = atoi(val);
@@ -467,7 +490,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 
         if(strncmp(name,"within",6) == 0) {
 		if(sig->popts == NULL) {
-			log_error("Found within keyword without (uri)content first\n");
+			log_error("Found within keyword without (uri)content first");
 			return 1;
 		}
                 sig->popts->within = atoi(val);
@@ -477,7 +500,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 	// Replace is fun ;p but BROKEN
         if(strncmp(name,"replace",7) == 0) {
 		if((content = get_last_content(sig)) == NULL) {
-			log_error("Found replace keyword without content first\n");
+			log_error("Found replace keyword without content first");
 			return 1;
 		}
                 content->replace = strdup(val);
@@ -487,7 +510,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 
         if(strncmp(name,"distance",8) == 0) {
 		if(sig->popts == NULL) {
-			log_error("Found distance keyword without (uri)content first\n");
+			log_error("Found distance keyword without (uri)content first");
 			return 1;
 		}
                 sig->popts->distance = atoi(val);
@@ -541,75 +564,244 @@ struct uricontent* get_last_uricontent(struct signature *sig) {
 	return last;
 }
 
+// 
+// Function for making TCP and UDP index tables
+// based on port. These are build ON TOP of the
+// signature linked list
+//
+
+int make_signature_indexes (int proto) {
+
+	struct signature* sret;
+	struct signature* sptr;
+	int i=0;
+
+	log_info("Going to index signatures: proto %d",proto);
+
+	for(i=0;i<SIG_INDEX_SIZE;i++) {
+		SIG_INDEX_TCP_SRC[i] = NULL;
+		SIG_INDEX_TCP_DST[i] = NULL;
+		SIG_INDEX_UDP_SRC[i] = NULL;
+		SIG_INDEX_UDP_DST[i] = NULL;
+	}
+
+        if(sigarray[proto] == NULL)
+                return -1;
+
+	// For list iteration
+	struct list_entry* ret = sigarray[proto]->start;
+
+	if(ret == NULL)
+		return -1;
+
+	do {
+		sret = (struct signature*)ret->data;
+		sret->next = NULL;
+
+		if(sret->srcport.range == 1) {
+			// Put references everywhere
+			for(i=sret->srcport.start;i<sret->srcport.stop;i++) {
+				if(SIG_INDEX_TCP_SRC[i] == NULL) {
+					SIG_INDEX_TCP_SRC[i] = sret; 
+				} else {
+					sptr = SIG_INDEX_TCP_SRC[i];
+					while(sptr->next != NULL) {
+						sptr = sptr->next;
+					}	
+					sptr->next = sret;
+					sptr->next->next=NULL;
+				}
+			}
+		} else if(sret->srcport.range == 0) {
+                        if(SIG_INDEX_TCP_SRC[sret->srcport.start] == NULL) {
+                                SIG_INDEX_TCP_SRC[sret->srcport.start] = sret;
+                        } else { 
+                
+                                sptr = SIG_INDEX_TCP_SRC[sret->srcport.start];
+                                while(sptr->next != NULL) {
+                                        sptr = sptr->next;
+                                }
+                                sptr->next = sret;
+				sptr->next->next=NULL;
+                        }
+		}	
+
+                if(sret->dstport.range == 0) {
+                        if(SIG_INDEX_TCP_DST[sret->dstport.start] == NULL) {
+                                SIG_INDEX_TCP_DST[sret->dstport.start] = sret;
+                        } else {
+                                sptr = SIG_INDEX_TCP_DST[sret->dstport.start];
+                                while(sptr->next != NULL) {
+                                        sptr = sptr->next;
+                                }
+                                sptr->next = sret;
+				sptr->next->next=NULL;
+                        }
+
+                } else if(sret->dstport.range == 1) {
+
+                        // Put references everywhere
+                        for(i=sret->dstport.start;i< sret->dstport.stop;i++) {
+                                if(SIG_INDEX_TCP_DST[i] == NULL) {
+                                        SIG_INDEX_TCP_DST[i] = sret;
+                                } else {
+					sptr = SIG_INDEX_TCP_DST[i];
+					while(sptr->next != NULL) {
+						sptr = sptr->next;
+					}
+
+					sptr->next = sret;
+					sptr->next->next=NULL;
+                                }
+                        }
+                }
+
+	} while((ret = ret->next) != NULL);
+	return 0;
+}
+
+// Match signature using index. Return 1 if it matched a signature..
+struct signature* indexed_match_signature(struct traffic* traffic) {
+
+	int srcport;
+	int dstport;
+	struct signature *src_index;
+	struct signature *dst_index;
+
+        struct signature *sret;
+
+	// Todo: optimize index access
+	//  with protocl array
+	if(traffic->proto == P_TCP) {
+		srcport = htons(traffic->tcphdr->th_sport);
+		dstport = htons(traffic->tcphdr->th_dport);
+		src_index = SIG_INDEX_TCP_SRC[srcport];
+		dst_index = SIG_INDEX_TCP_DST[dstport];
+	} else if(traffic->proto == P_UDP)  {
+		srcport = htons(traffic->udphdr->uh_sport);
+		dstport = htons(traffic->udphdr->uh_dport);
+		src_index = SIG_INDEX_UDP_SRC[srcport];
+		dst_index = SIG_INDEX_UDP_DST[dstport];
+	} else {
+		log_error("WTF indexed_match_signature");
+		return NULL;
+	}
+
+	// First look at the dst port index
+	sret = src_index;
+	while(sret != NULL) {
+
+		// Check if the destination port also matches or bail out
+		if (sret->srcport.range == 0) {
+			if(sret->srcport.start != srcport)  
+				return NULL;
+		} else if(sret->srcport.range != -1) { 
+			if(srcport < sret->srcport.start || srcport > sret->srcport.stop)
+				return NULL;
+		}
+
+
+		// Ok, now check the rest
+		//printf("Ok performing test! %s\n",sret->msg);
+		if(compare_traffic_signature(traffic,sret) == 1) {
+			return sret;
+		}
+		sret = sret->next;
+	}
+
+        // Now look at the source ports part. If we get here then we'll only
+	// find rules with "any" as destinations.. if the rules here would have had an explicit or
+	// range port then they would have been dealt with in the above code.
+
+	sret = dst_index;
+	while(sret != NULL) {
+		if(compare_traffic_signature(traffic,sret) == 1) {
+			//printf("Match from compare_traffic_signature\n");
+			return sret;
+		}
+		sret = sret->next;
+	}
+
+	return NULL;
+}
+
+
 
 // Match signature. Return 1 if it matched a signature..
 struct signature* match_signature(struct traffic* traffic) {
+
+	struct list_entry* ret;
+	struct signature* sret;
 
 	// Bail out if we have no signatures for this protocol
 	if(sigarray[traffic->proto] == NULL)
 		return NULL;
 
-	// TODO: add locking
-        struct list_entry* ret = sigarray[traffic->proto]->start;
-	struct signature* sret;
-	int count, retval;
+        ret = sigarray[traffic->proto]->start;
 
 	// Return if 0
 	if(ret == NULL)
 		return NULL; 
 
+        if(traffic->proto == P_TCP) {
+		//printf("Calling indexed\n");
+                if((sret = indexed_match_signature(traffic)) != NULL) {
+                        stats_increase_cnt(CNT_SIG_MATCH,1);
+                        return sret;
+                }
+                return NULL;
+        }
+
+
 	do {
 		sret = (struct signature*)ret->data;
-
-		if(sret->proto != traffic->proto)
-			continue;
-
-		if(traffic->proto == P_TCP) {
-			if(sret->srcport != -1 && sret->srcport != htons(traffic->tcphdr->th_sport)) {
-				continue;
-			}
-			if(sret->dstport != -1 && sret->dstport != htons(traffic->tcphdr->th_dport)) {
-				continue;
-			}
+		if(compare_traffic_signature(traffic,sret) == 1) {
+			//printf("Match from compare_traffic_signature\n");
+                        stats_increase_cnt(CNT_SIG_MATCH,1);
+			return sret;
 		}
 
-		if(traffic->proto == P_UDP) {
-			if(sret->srcport != -1 && sret->srcport != htons(traffic->udphdr->uh_sport)) {
-				continue;
-			}
-			if(sret->dstport != -1 && sret->dstport != htons(traffic->udphdr->uh_dport)) {
-				continue;
-			}
+
+        } while((ret = ret->next) != NULL);
+
+        return NULL;
+}
+
+int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
+
+	int count;
+
+	if(sret->proto != traffic->proto)
+		return 0;
+
+	if(traffic->proto == P_UDP) {
+		if(sret->dstport.range != -1 && sret->srcport.start != htons(traffic->udphdr->uh_sport)) {
+			return 0;
 		}
+		if(sret->dstport.range != -1 && sret->dstport.start != htons(traffic->udphdr->uh_dport)) {
+			return 0;
+		}
+	}
 
-		// Fire off the detection hooks
-		for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
-			if(sret->DetectHooks[count] == NULL)
-				break;
+	// Fire off the detection hooks
+	for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
+		if(sret->DetectHooks[count] == NULL)
+			break;
 
-			// 0 means no match, 1 means bingo
-			retval = sret->DetectHooks[count]->hook(sret,traffic);
+		// 0 means no match, 1 means bingo
+		if(sret->DetectHooks[count]->hook(sret,traffic) == 0) {
 			//printf("Hook %s returned %d\n",sret->DetectHooks[count]->name,retval);
-			if(retval == 0) {
-				break;
-			}			
+			return 0;
 		}
+		//printf("Hook %s returned %d\n",sret->DetectHooks[count]->name,retval);
+	}
 
-		// Check the last return value.. if its 0 then continue to the
-		// next signature
-		if(retval == 0) {
-			continue;
-		}
+	// Reached the end.. this means the packet matches all requirements and
+	// thus we can return the signature.
 
-		// Reached the end.. this means the packet matches all requirements and
-		// thus we can return the signature.
+	stats_increase_cnt(CNT_SIG_MATCH,1);
+	return 1;
 
-		stats_increase_cnt(CNT_SIG_MATCH,1);
-		return sret;
-
-	} while((ret = ret->next) != NULL);
-
-	return NULL;
 }
 
 //
@@ -622,7 +814,6 @@ void dumpSignature(struct signature *sig) {
 	printf("\n\n ======> SID: %d\n",sig->sid);
 	printf("Message:     %s\n",sig->msg);
 //	printf("Matchstr:    \"%s\"\n",sig->matchstr);
-	//printf("Matchstr:    Hex: \"");
 
 	//for(i =0; i < sig->matchstr_size;i++) {
 //		printf("%x ",sig->matchstr[i]);
@@ -631,8 +822,8 @@ void dumpSignature(struct signature *sig) {
 
 	
 	printf("Proto:       %d\n",sig->proto);
-	printf("Srcport:     %d\n",sig->srcport);
-	printf("Dstport:     %d\n",sig->dstport);
+	printf("Srcport:     val: %d-%d neg: %d range: %d\n",sig->srcport.start,sig->srcport.stop,sig->srcport.neg, sig->srcport.range);
+	printf("Dstport:     val: %d-%d neg: %d range: %d\n",sig->dstport.start,sig->dstport.stop, sig->dstport.neg, sig->dstport.range);
 	//printf("Classtype:   %s\n",sig->classtype);
 	//printf("Conn state:  %s\n",sig->connection_state);
 
@@ -740,7 +931,17 @@ struct signature * getSignatureStruct() {
                 sigstruct->dsize_type = DSIZE_EQUAL;
                 sigstruct->dsize = 0;
 		sigstruct->connection_state = -1;
-		sigstruct->regex  = NULL;
+		sigstruct->regex = NULL;
+		sigstruct->next  = NULL;
+
+		sigstruct->dstport.start = -1;
+		sigstruct->dstport.stop  = -1;
+		sigstruct->dstport.range = 0;
+		sigstruct->dstport.neg   = 0;
+		sigstruct->srcport.start = -1;
+		sigstruct->srcport.stop  = -1;
+		sigstruct->srcport.range = 0;
+		sigstruct->srcport.neg   = 0;
 
 		// Default actoin is drop. Todo: make this configurable
 		sigstruct->action = SIG_ACTION_DROP;

@@ -41,5 +41,7 @@ int traffic_to_file(char *file, struct traffic *traf);
 struct traffic * divert_to_traffic(void *packet, int psize);
 struct traffic * pcap_to_traffic(void *packet, const struct pcap_pkthdr* pkthdr);
 void traffic_dump(struct traffic* traffic);
+int compare_traffic_signature(struct traffic* traffic, struct signature* sret);
+
 
 #endif
