@@ -94,7 +94,6 @@ struct signature {
         struct intvalue srcport;
         struct intvalue dstport;
         int type;
-        int hits;
 
 	// TCP specific
 	u_int32_t seq;
@@ -133,6 +132,10 @@ struct signature {
 	// For linking
 	struct signature *next;
 
+	// For sorting
+        int hits;
+	int matches;
+
 };
 
 
@@ -154,6 +157,7 @@ struct signature* indexed_match_signature(struct traffic* traffic);
 int make_signature_indexes (int proto, struct signature* src_ptr[], struct signature* dst_ptr[]);
 
 int init_signature_indexes();
+void dump_signature_index(struct signature* src_ptr[]);
 
 
 #endif 

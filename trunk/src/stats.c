@@ -101,34 +101,36 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"\n--------------------------------------\n");
 	fprintf(fd,"            IDS STATISTICS\n");
 	fprintf(fd,"--------------------------------------\n");
-	fprintf(fd,"IP             %d\n",stat_get(CNT_IP));
-	fprintf(fd,"IP Error       %d\n",stat_get(CNT_IP_ERR));
-	fprintf(fd,"IP frags tmout %d\n",stat_get(CNT_IP_FRAG_TMOUT));
-	fprintf(fd,"IP Queue       %d\n",trafficlist->entry_cnt);
-	fprintf(fd,"IP Frags       %d\n",stat_get(CNT_IP_FRAG));
-	fprintf(fd,"IP Frags Queue %d\n",stat_get(CNT_IP_FRAG_QUEUE));
-	fprintf(fd,"TCP            %d\n",stat_get(CNT_TCP));
-	fprintf(fd,"UDP            %d\n",stat_get(CNT_UDP));
-	fprintf(fd,"ICMP           %d\n",stat_get(CNT_ICMP));
-	fprintf(fd,"Sessions cnt   %d (total)\n",stat_get(CNT_SESSION_TOTAL));
-	fprintf(fd,"Total data     %d MB\n",stat_get(CNT_IP_DATA_SIZE) / (1024 * 1024));
-	fprintf(fd,"Sig match      %d\n",stat_get(CNT_SIG_MATCH));
-	fprintf(fd,"Sig count      %d\n",stat_get(CNT_SIG_LOADED));
+	fprintf(fd,"IP                %d\n",stat_get(CNT_IP));
+	fprintf(fd,"IP Error          %d\n",stat_get(CNT_IP_ERR));
+	fprintf(fd,"IP frags tmout    %d\n",stat_get(CNT_IP_FRAG_TMOUT));
+	fprintf(fd,"IP Queue          %d\n",trafficlist->entry_cnt);
+	fprintf(fd,"IP Frags          %d\n",stat_get(CNT_IP_FRAG));
+	fprintf(fd,"IP Frags Queue    %d\n",stat_get(CNT_IP_FRAG_QUEUE));
+	fprintf(fd,"TCP               %d\n",stat_get(CNT_TCP));
+	fprintf(fd,"UDP               %d\n",stat_get(CNT_UDP));
+	fprintf(fd,"ICMP              %d\n",stat_get(CNT_ICMP));
+	fprintf(fd,"Sessions cnt      %d (total)\n",stat_get(CNT_SESSION_TOTAL));
+	fprintf(fd,"Total data        %d MB\n",stat_get(CNT_IP_DATA_SIZE) / (1024 * 1024));
+	fprintf(fd,"Sig match         %d\n",stat_get(CNT_SIG_MATCH));
+	fprintf(fd,"Sig count         %d\n",stat_get(CNT_SIG_LOADED));
+	fprintf(fd,"Sig tests total   %d\n",stat_get(CNT_SIG_TESTS));
+	fprintf(fd,"Sig tests indexed %d\n",stat_get(CNT_SIG_TESTS_INDEX));
 	fprintf(fd,"\n");
-	fprintf(fd,"Hash map hits  %d\n",stat_get(CNT_HASHMAP_HITS));
-	fprintf(fd,"Hash map miss  %d\n",stat_get(CNT_HASHMAP_MISS));
-	fprintf(fd,"Mem alloc      %d\n",stat_get(CNT_MEM_ALLOC));
-	fprintf(fd,"Mem free       %d\n",stat_get(CNT_MEM_FREE));
+	fprintf(fd,"Hash map hits     %d\n",stat_get(CNT_HASHMAP_HITS));
+	fprintf(fd,"Hash map miss     %d\n",stat_get(CNT_HASHMAP_MISS));
+	fprintf(fd,"Mem alloc         %d\n",stat_get(CNT_MEM_ALLOC));
+	fprintf(fd,"Mem free          %d\n",stat_get(CNT_MEM_FREE));
 	fprintf(fd,"\n");
-	fprintf(fd,"Message queue  %d\n",logqueue->entry_cnt);
-	fprintf(fd,"Message error  %d\n",stat_get(CNT_LOG_TYPE_ERROR));
-	fprintf(fd,"Message alert  %d\n",stat_get(CNT_LOG_TYPE_ALERT));
-	fprintf(fd,"Message info   %d\n",stat_get(CNT_LOG_TYPE_INFO));
-	fprintf(fd,"Message fatal  %d\n",stat_get(CNT_LOG_TYPE_FATAL));
-	fprintf(fd,"Message warn   %d\n",stat_get(CNT_LOG_TYPE_WARN));
+	fprintf(fd,"Message queue     %d\n",logqueue->entry_cnt);
+	fprintf(fd,"Message error     %d\n",stat_get(CNT_LOG_TYPE_ERROR));
+	fprintf(fd,"Message alert     %d\n",stat_get(CNT_LOG_TYPE_ALERT));
+	fprintf(fd,"Message info      %d\n",stat_get(CNT_LOG_TYPE_INFO));
+	fprintf(fd,"Message fatal     %d\n",stat_get(CNT_LOG_TYPE_FATAL));
+	fprintf(fd,"Message warn      %d\n",stat_get(CNT_LOG_TYPE_WARN));
 	fprintf(fd,"\n");
-	fprintf(fd,"Queue push   %d\n",stat_get(CNT_QUEUE_PUSH));
-	fprintf(fd,"Queue pop    %d\n",stat_get(CNT_QUEUE_POP));
+	fprintf(fd,"Queue push        %d\n",stat_get(CNT_QUEUE_PUSH));
+	fprintf(fd,"Queue pop         %d\n",stat_get(CNT_QUEUE_POP));
 	fprintf(fd,"\n");
 	fprintf(fd,"Average bytes     %3.2f (%s)\n",rate,rname );
 	fprintf(fd,"Average packets   %d (p/s)\n",stat_get(CNT_IP) / secondsrunning );
@@ -137,6 +139,16 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"\n");
 	fprintf(fd,"Pkts not matching session %d (dropped)\n",stat_get(CNT_SESSION_MISS));
 	fprintf(fd,"--------------------------------------\n");
+
+//        printf("Dumping SIG_INDEX_TCP_DST\n");
+ //       dump_signature_index(SIG_INDEX_TCP_DST);
+  //      printf("Dumping SIG_INDEX_TCP_SRC\n");
+   //     dump_signature_index(SIG_INDEX_TCP_SRC);
+    //    printf("Dumping SIG_INDEX_UDP_SRC\n");
+     //   dump_signature_index(SIG_INDEX_UDP_SRC);
+      //  printf("Dumping SIG_INDEX_UDP_DST\n");
+       // dump_signature_index(SIG_INDEX_UDP_DST);
+
 
 }
 

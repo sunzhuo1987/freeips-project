@@ -176,6 +176,7 @@ int traffic_analyzer(void *data,struct list_entry *packet) {
 		}
 
 		packet->popped = 1;
+		sig->matches++;
                 alert(sig,traffic);
 
 	} else {
