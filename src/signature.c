@@ -589,10 +589,45 @@ int init_signature_indexes() {
 	SIG_INDEXES_SRC[P_UDP] = *SIG_INDEX_UDP_SRC; 
 	SIG_INDEXES_DST[P_UDP] = *SIG_INDEX_UDP_DST;
 
-	make_signature_indexes(P_TCP,SIG_INDEX_TCP_SRC,SIG_INDEX_TCP_DST);
-	make_signature_indexes(P_UDP,SIG_INDEX_UDP_SRC,SIG_INDEX_UDP_DST);
+	if(make_signature_indexes(P_TCP,SIG_INDEX_TCP_SRC,SIG_INDEX_TCP_DST) == 0) {
+		log_info("Created index for signatures: type TCP ");
+	}
+
+	if(make_signature_indexes(P_UDP,SIG_INDEX_UDP_SRC,SIG_INDEX_UDP_DST) == 0) {
+		log_info("Created index for signatures: type UDP ");
+	}
 
 	return 0;
+}
+
+//
+// Dump indexes
+//
+
+void dump_signature_index(struct signature* src_ptr[]) {
+	struct signature* sptr;
+	int i,hits,count;
+
+	printf("Dumping index \n");
+
+	for(i=0;i<SIG_INDEX_SIZE;i++) {
+
+		if(src_ptr[i] != NULL) {
+
+			count = 1;
+			hits =0;
+			sptr = src_ptr[i];
+
+			hits += sptr->hits;		
+			while(sptr->next != NULL) {
+				count++;
+				hits += sptr->hits;		
+				sptr = sptr->next;
+			}
+
+			printf("PORT: %d Entries: %d Hits: %d \n",i,count,hits);
+		}
+	}
 }
 
 // 
@@ -607,7 +642,6 @@ int make_signature_indexes (int proto, struct signature* src_ptr[], struct signa
 	struct signature* sptr;
 	int i=0;
 
-	log_info("Going to index signatures: proto %d",proto);
 
         if(sigarray[proto] == NULL)
                 return -1;
@@ -727,6 +761,8 @@ struct signature* indexed_match_signature(struct traffic* traffic) {
 
 		// Ok, now check the rest
 		//printf("Ok performing test! %s\n",sret->msg);
+		stats_increase_cnt(CNT_SIG_TESTS_INDEX,1);
+		sret->hits++;
 		if(compare_traffic_signature(traffic,sret) == 1) {
 			return sret;
 		}
@@ -739,6 +775,8 @@ struct signature* indexed_match_signature(struct traffic* traffic) {
 
 	sret = dst_index;
 	while(sret != NULL) {
+		stats_increase_cnt(CNT_SIG_TESTS_INDEX,1);
+		sret->hits++;
 		if(compare_traffic_signature(traffic,sret) == 1) {
 			//printf("Match from compare_traffic_signature\n");
 			return sret;
@@ -779,6 +817,7 @@ struct signature* match_signature(struct traffic* traffic) {
 
 	do {
 		sret = (struct signature*)ret->data;
+		sret->hits++;
 		if(compare_traffic_signature(traffic,sret) == 1) {
 			//printf("Match from compare_traffic_signature\n");
                         stats_increase_cnt(CNT_SIG_MATCH,1);
@@ -797,6 +836,8 @@ int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
 
 	if(sret->proto != traffic->proto)
 		return 0;
+
+	stats_increase_cnt(CNT_SIG_TESTS,1);
 
 	// Fire off the detection hooks
 	for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
@@ -945,6 +986,7 @@ struct signature * getSignatureStruct() {
                 sigstruct->direction = -1;
                 sigstruct->dsize_type = DSIZE_EQUAL;
                 sigstruct->dsize = 0;
+                sigstruct->hits = 0;
 		sigstruct->connection_state = -1;
 		sigstruct->regex = NULL;
 		sigstruct->next  = NULL;

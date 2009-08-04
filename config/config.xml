@@ -45,7 +45,6 @@
 	<html_footer>support/html/footer.html</html_footer>
 	<html_header>support/html/header.html</html_header>
 
-
 	<timer>
 		<print_stats>10</print_stats>
 		<cleanup_tcp>3600</cleanup_tcp>
