@@ -261,7 +261,7 @@ void sigquit_handler () {
 		pcap_breakloop(handle);
 	
 	//close files
-	logfiles_close();
+	logoutputs_close();
 
 }
 

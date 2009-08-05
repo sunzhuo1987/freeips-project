@@ -75,7 +75,7 @@ int load_signatures(char *sigfile) {
 		if (strncmp(sigline,"#",1) == 0 || strlen(sigline) < 10) 
 			continue;
 
-		DEBUGF("Going to process signature: %s\n",sigline);
+		//DEBUGF("Going to process signature: %s\n",sigline);
 		sigstruct = getSignatureStruct();
 		if(sigparse(sigline,sigstruct) == 1) {
 			if(CONFIG_LOG_VERBOSE > 2) {
@@ -105,7 +105,7 @@ int load_signatures(char *sigfile) {
                         sigarray[sigstruct->proto] = getNewList();
                 }
 
-                DEBUGF("Read signature: %s \n",sigstruct->msg);
+                //DEBUGF("Read signature: %s \n",sigstruct->msg);
                 pushListEntry(sigstruct,sigarray[sigstruct->proto]);
 		stats_increase_cnt(CNT_SIG_LOADED,1);
                 sigcount++;

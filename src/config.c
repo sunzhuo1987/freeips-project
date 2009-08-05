@@ -63,11 +63,9 @@ int init_config() {
 	CONFIG_TIMER_STATS=600;       
 	CONFIG_TIMER_TCP_CLEANER=3600; 
 	CONFIG_TIMER_IPFRAG_CLEANER=10; 
-	CONFIG_TIMER_CLEANUPPBUFFER=5;
 
-	// packet buffer
-	CONFIG_PACKET_BL_BUFFER=1000;
-	CONFIG_MAX_LIST_SIZE=500000;
+	// Ringbuffer
+	CONFIG_RINGBUFFER_SIZE=500000;
 	
 	// Control thread
 	CONFIG_CONTROL_HTTP_PORT   = 3491;
@@ -81,7 +79,7 @@ int init_config() {
         base64_encode(CONFIG_CONTROL_HTTP_AUTH_CLEAR,CONFIG_CONTROL_HTTP_AUTH);
 
 	// Initialize the logfiles
-	logfiles_init();
+	logoutputs_init();
 
 
 	return 0;
@@ -127,23 +125,13 @@ void parse_general (xmlDocPtr doc, xmlNodePtr cur) {
 			strncpy(CONFIG_SIGFILE,(char *)key,CONFIG_MAX_CHAR);
 			xmlFree(key);
 		}
-		if ((!xmlStrcmp(cur->name, (const xmlChar *)"packetblbuffer"))) {
-			key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-			number = atoi((char *)key);
-			if(number > 0) {
-				CONFIG_PACKET_BL_BUFFER = number;
-			} else {
-				log_warn("Configuration option for \"packetblbuffer\" should greater then 0");
-			}
-			xmlFree(key);
-		}
-                if ((!xmlStrcmp(cur->name, (const xmlChar *)"packetbuffer"))) {
+                if ((!xmlStrcmp(cur->name, (const xmlChar *)"ringbuffer"))) {
                         key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
                         number = atoi((char *)key);
-                        if(number > 0) {
-                                CONFIG_MAX_LIST_SIZE = number;
+                        if(number > 1) {
+                                CONFIG_RINGBUFFER_SIZE = number;
                         } else {
-                                log_warn("Configuration option for \"packetbuffer\" should greater then 0");
+                                log_warn("Configuration option for \"ringbuffer\" should greater then 1");
                         }
                         xmlFree(key);
                 }
@@ -311,16 +299,6 @@ void parse_control (xmlDocPtr doc, xmlNodePtr cur) {
 					}
 					xmlFree(key);
 				}
-				if ((!xmlStrcmp(tmp->name, (const xmlChar *)"cleanup_packetbuffer"))) {
-					key = xmlNodeListGetString(doc, tmp->xmlChildrenNode, 1);
-					number = atoi((char *)key);
-					if(number > 1 || number < 65535) {
-						CONFIG_TIMER_CLEANUPPBUFFER=number;
-					} else {
-						log_warn("Configuration option for \"cleanup_packetbuffer\" is not sane");
-					}
-					xmlFree(key);
-				}
 				if ((!xmlStrcmp(tmp->name, (const xmlChar *)"cleanup_tcp"))) {
 					key = xmlNodeListGetString(doc, tmp->xmlChildrenNode, 1);
 					number = atoi((char *)key);
@@ -453,8 +431,8 @@ void parse_logging (xmlDocPtr doc, xmlNodePtr cur) {
                                         key = xmlNodeListGetString(doc, tmp->xmlChildrenNode, 1);
 
 					if(loglevel != LOG_TYPE_ALL && loglevel < LOG_FILE_NAME_CNT && loglevel > 0) {
-						logfiles[loglevel].enable = enable;
-						strncpy(logfiles[loglevel].name,(char *)key,CONFIG_MAX_CHAR);
+						logoutputs[loglevel].enable = enable;
+						strncpy(logoutputs[loglevel].name,(char *)key,CONFIG_MAX_CHAR);
 					} else {
 
 						// All levels to this file
@@ -462,11 +440,11 @@ void parse_logging (xmlDocPtr doc, xmlNodePtr cur) {
 							// If "other" is used then log everything *else*
 							// into this file.
 							if(loglevel == LOG_TYPE_OTHER) {
-								if(logfiles[loglevel].name != NULL);
+								if(logoutputs[loglevel].name != NULL);
 									continue;
 							}
-							logfiles[number].enable = enable;
-							strncpy(logfiles[number].name,(char *)key,CONFIG_MAX_CHAR);
+							logoutputs[number].enable = enable;
+							strncpy(logoutputs[number].name,(char *)key,CONFIG_MAX_CHAR);
 						}
 					}
 

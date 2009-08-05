@@ -103,10 +103,12 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"--------------------------------------\n");
 	fprintf(fd,"IP                %d\n",stat_get(CNT_IP));
 	fprintf(fd,"IP Error          %d\n",stat_get(CNT_IP_ERR));
-	fprintf(fd,"IP frags tmout    %d\n",stat_get(CNT_IP_FRAG_TMOUT));
-	fprintf(fd,"IP Queue          %d\n",trafficlist->entry_cnt);
+	fprintf(fd,"IP Queue          %d\n",trafficlist->data_cnt);
 	fprintf(fd,"IP Frags          %d\n",stat_get(CNT_IP_FRAG));
+	fprintf(fd,"IP Frags Tmout    %d\n",stat_get(CNT_IP_FRAG_TMOUT));
+	fprintf(fd,"IP Frags Reass    %d\n",stat_get(CNT_IP_FRAG_REASS));
 	fprintf(fd,"IP Frags Queue    %d\n",stat_get(CNT_IP_FRAG_QUEUE));
+	fprintf(fd,"IP Ring Buffer    %d\n",trafficlist->entry_cnt);
 	fprintf(fd,"TCP               %d\n",stat_get(CNT_TCP));
 	fprintf(fd,"UDP               %d\n",stat_get(CNT_UDP));
 	fprintf(fd,"ICMP              %d\n",stat_get(CNT_ICMP));

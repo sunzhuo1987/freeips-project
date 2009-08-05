@@ -45,9 +45,10 @@ void pcap_analyzer() {
 
         while(loop_analyzer == 1) {
 
-		packet = popListEntryPtr(trafficlist);
+		traffic = popRingData(trafficlist);
+
                 // There might be no data
-                if(packet == NULL || packet->data == NULL) {
+                if(traffic == NULL) {
                         //DEBUG(stdout,"No data in memory..\n");
                         //Avoid CPU hogging
                         usleep(10000);
@@ -60,8 +61,6 @@ void pcap_analyzer() {
                         }
                 } else {
 			stats_increase_cnt(CNT_QUEUE_POP,1);
-
-			traffic = (struct traffic*)packet->data;
                         traffic_analyzer(traffic,packet);
                 }
         }
@@ -129,7 +128,7 @@ int traffic_analyzer(void *data,struct list_entry *packet) {
 					return 0;
 				case 2:
 					//Throw it back in the pool
-					pushListEntry(traffic,trafficlist);
+					pushRingData(traffic,trafficlist);
 					return 0;
 			}
 
@@ -175,7 +174,6 @@ int traffic_analyzer(void *data,struct list_entry *packet) {
 			divert_inject(traffic);
 		}
 
-		packet->popped = 1;
 		sig->matches++;
                 alert(sig,traffic);
 
@@ -186,7 +184,7 @@ int traffic_analyzer(void *data,struct list_entry *packet) {
 			divert_inject(traffic);
 		}
 
-		packet->popped = 1;
+		traffic_free(traffic);
 	}
 
         return 0;

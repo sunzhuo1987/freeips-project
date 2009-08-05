@@ -40,22 +40,22 @@ struct linked_list *logqueue = NULL;
 FILE *logfd = NULL;
 
 // Todo add syslog stuff here aswell
-void logfiles_init() {
+void logoutputs_init() {
 
 	int i;
 	for(i=0;i<LOG_FILE_NAME_CNT;i++) {
-		logfiles[i].enable = 0;
-		logfiles[i].fd = NULL;
+		logoutputs[i].enable = 0;
+		logoutputs[i].fd = NULL;
 	}
 }
 
 
-void logfiles_close() {
+void logoutputs_close() {
 
         int i;
         for(i=0;i<LOG_FILE_NAME_CNT;i++) {
-		if(logfiles[i].fd != NULL)
-			fclose(logfiles[i].fd);
+		if(logoutputs[i].fd != NULL)
+			fclose(logoutputs[i].fd);
         }
 }
 
@@ -88,7 +88,7 @@ void pop_all_messages() {
 
 int pop_message() {
 	Message *msg;
-	//char logfile[128];
+	char logfile[128];
 
 	if((msg = (Message *)popListEntry(logqueue)) == NULL) {
 		return 0;
@@ -97,11 +97,6 @@ int pop_message() {
 	// Check if this is a real alert.. if so then dump
 	// the traffic and free it
 	if(msg->type == LOG_TYPE_ALERT) {
-
-		/*
-
-		This is now broken !!!!
-		Needs to be rewritten anyway
 
 		if(CONFIG_LOG_STDOUT == 1) {
 			if(CONFIG_LOG_VERBOSE > 1) {
@@ -123,10 +118,7 @@ int pop_message() {
 		}
 	
 		// Free the memory
-		freeMem(msg->traffic->data);
-		freeMem(msg->traffic);
-
-		*/
+		traffic_free(msg->traffic);
 	}
 
 	do_log(msg);
@@ -204,15 +196,15 @@ void do_log(Message *msg)
 		printf("%s: %s: %s\n",timebuf,logtypes[msg->type],msg->msg);
 	}
 
-	if(logfiles[msg->type].enable == 1) {
-		if(logfiles[msg->type].fd == NULL) {
-			if((logfiles[msg->type].fd = fopen(logfiles[msg->type].name,"a")) == NULL) {
-				printf("ERROR: unable to write logfile: %s! (permissions?)\n",logfiles[msg->type].name);
+	if(logoutputs[msg->type].enable == 1) {
+		if(logoutputs[msg->type].fd == NULL) {
+			if((logoutputs[msg->type].fd = fopen(logoutputs[msg->type].name,"a")) == NULL) {
+				printf("ERROR: unable to write logfile: %s! (permissions?)\n",logoutputs[msg->type].name);
 				// It is a choice to NOT exit here..
 			}
 		} else {
-			fprintf(logfiles[msg->type].fd,"%s: %s: %s\n",timebuf,logtypes[msg->type],msg->msg);	
-			fflush(logfiles[msg->type].fd);
+			fprintf(logoutputs[msg->type].fd,"%s: %s: %s\n",timebuf,logtypes[msg->type],msg->msg);	
+			fflush(logoutputs[msg->type].fd);
 		}
 	}
 
