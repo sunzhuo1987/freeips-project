@@ -11,7 +11,7 @@ struct logfilestruct {
 	int enable;
 };
 
-struct logfilestruct logfiles[LOG_FILE_NAME_CNT];
+struct logfilestruct logoutputs[LOG_FILE_NAME_CNT];
 
 #define LOG_TYPE_ERROR 0
 #define LOG_TYPE_ALERT 1
@@ -41,7 +41,7 @@ void log_alert(struct traffic *traf, char *string, ...);
 void alert(struct signature* sig, struct traffic* traffic );
 void log_warn(char *string, ...);
 void fatal_error(char *string, ...);
-void logfiles_init();
-void logfiles_close();
+void logoutputs_init();
+void logoutputs_close();
 
 #endif

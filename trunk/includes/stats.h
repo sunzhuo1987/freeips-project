@@ -33,6 +33,7 @@ unsigned long stat_cnts[MAX_CNTS];
 #define CNT_IP_FRAG		51	
 #define CNT_IP_FRAG_TMOUT	52	
 #define CNT_IP_FRAG_QUEUE	53	
+#define CNT_IP_FRAG_REASS	54	
 
 #define CNT_LOG_TYPE_ERROR      60
 #define CNT_LOG_TYPE_ALERT      61

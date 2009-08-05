@@ -49,7 +49,6 @@ struct list_entry * newListEntry() {
 	new->prev = NULL;
 	new->data = NULL;
 	new->hits = 0;
-	new->popped = 0;
 	return new;
 }
 
@@ -68,9 +67,6 @@ struct linked_list * newList() {
 	new->entry_max = 0;
 	new->entry_cnt = 0;
 
-	new->backlog_max = CONFIG_PACKET_BL_BUFFER;
-	new->backlog_cnt = 0;
-
 	ses->destructor = NULL;
 	ses->iterator   = NULL;
 
@@ -88,9 +84,6 @@ struct linked_list * newLiteList() {
         new->start = NULL;
         new->stop  = NULL;
         new->ptr   = NULL;
-
-	new->backlog_max = CONFIG_PACKET_BL_BUFFER;
-	new->backlog_cnt = 0;
 
         new->entry_max = 0;
         new->entry_cnt = 0;
@@ -127,6 +120,75 @@ struct linked_list * getNewList() {
 	return list;
 }
 
+//
+//
+// Create ringbuffer
+//
+//
+
+struct linked_list * getRingBuffer(int entries) {
+
+	int i;
+	struct linked_list *ring =  getNewList();
+
+	// Set the maximum
+	ring->entry_max = entries;
+	ring->data_cnt  = 0;
+
+	//Now fill the list (optimize)
+	for(i=0;i<entries;i++) {
+		pushListEntry(NULL,ring);
+	}
+
+	// Now tie the start and end together
+	// to get a ring..
+	ring->stop->next = ring->start;
+
+	// Now use stop as list pointer. Stop means where to push new
+	// items and start means where to pop items from. From this
+	// perspectie, during initial setup stop=start;
+	ring->stop = ring->start;
+
+	log_info("Created ring buffer with %d entries\n",entries);
+	return ring;
+}
+
+int pushRingData(void *data, struct linked_list* list) {
+
+	// Link the data and move the stop pointer
+	// to the next slot
+
+        lockList();
+	if(list->stop->data != NULL) {
+		//printf("There already is data (id: %d datacnt:%d start id: %d)\n",list->stop->id,list->data_cnt,list->start->id);
+		unlockList();
+		return 1;
+	}
+
+	list->stop->data = data;
+	list->stop = list->stop->next;
+        list->data_cnt++;
+	unlockList();
+	return 0;
+}
+
+void * popRingData(struct linked_list* list) {
+
+	lockList();
+	void *data = list->start->data;
+
+	if(data == NULL) {
+		unlockList();
+		return NULL;
+	}
+
+	// Cleanup
+	list->start->data = NULL;
+	list->start = list->start->next;
+	list->data_cnt--;
+        unlockList();
+	return data;
+}
 
 int pushListEntry (void *data, struct linked_list* list) {
 
@@ -166,7 +228,7 @@ int pushListEntry (void *data, struct linked_list* list) {
 	new->prev = NULL;
 	list->start = new;
 
-	DEBUGF("Added new list entry with ID: %d\n", new->id);
+	//DEBUGF("Added new list entry with ID: %d\n", new->id);
 	unlockList();
 	return new->id;
 }
@@ -276,50 +338,9 @@ void * popListEntryPtr(struct linked_list* list) {
 		list->ptr = list->ptr->prev;
 	}
 
-	list->backlog_cnt++;
 	unlockList();
 	return list->ptr;
 }
-
-//
-// Below function is to cleanup list entries from memory when the backlog
-// becomes too big. Backlog = list entries which have been analyzed already
-// but kept in memory for further analysis
-//
-
-void   cleanListBacklog(void *arg) {
-	int cnt = 0;
-	struct traffic* traffic;
-
-	struct linked_list *list = (struct linked_list *)arg;
-
-	DEBUG(stdout,"cleanListBacklog called !\n");
-	DEBUGF("list->backlog_cnt %d\n",list->backlog_cnt);
-	DEBUGF("list->backlog_max %d\n",list->backlog_max);
-
-	while(list->backlog_cnt > list->backlog_max) {
-
-		if(list->stop != NULL && list->stop->popped == 0) {
-			DEBUG(stdout, "cleanListBacklog: analyzer cannot keep up !");
-			return;
-		}
-
-
-		traffic = popListEntry(list);
-		if(traffic == NULL) { 
-			DEBUG(stdout, "cleanListBacklog: traffic = NULL?!");
-			return;
-		}
-
-		traffic_free(traffic);
-		cnt++;
-		list->backlog_cnt--;
-	}
-
-	DEBUGF("cleanListBacklog: Cleaned %d entries\n",cnt);
-	return;
-}
-
 
 //
 // Shift entries... for FIFO
@@ -694,5 +715,7 @@ void listSorter(void *ptr) {
 	}
 
 }
+
+
 
 #endif

@@ -60,10 +60,10 @@ int push_ip_frag(struct traffic* traffic) {
 	frag->traffic = traffic;
 	frag->offset <<= 3;
 
-	DEBUGF("Adding frag with ID:     %d\n",frag->id);
-	DEBUGF("Adding frag with OFFSET: %d\n",frag->offset);
 
 	stats_increase_cnt(CNT_IP_FRAG_QUEUE,1);
+	DEBUGF("Adding frag with ID:     %d\n",frag->id);
+	DEBUGF("Adding frag with OFFSET: %d\n",frag->offset);
 
 	if(fqueue[frag->id] == NULL) {
 		fqueue[frag->id] =new_queue(); 
@@ -73,7 +73,10 @@ int push_ip_frag(struct traffic* traffic) {
 
 		// Find the right queue
 		lqptr = qptr = fqueue[frag->id];
+		i=0;
+		frag_queue=NULL;
 		while(qptr != NULL) {
+			i++;
 			lqptr = qptr;
 			tmpfrag = (IPfrag*)qptr->list->start->data;
 			if(cmp_frag(tmpfrag,frag) == 0) {
@@ -85,7 +88,7 @@ int push_ip_frag(struct traffic* traffic) {
 
 		if(frag_queue == NULL) {
 			lqptr->next = new_queue();	
-			fqueue[frag->id]->id = frag->id;
+			lqptr->next->id = frag->id;
 			frag_queue = lqptr->next;
 			frag_queue->prev = lqptr;
 		}
@@ -111,7 +114,6 @@ int push_ip_frag(struct traffic* traffic) {
 			// Update error
 			stats_increase_cnt(CNT_IP_ERR,1);
 			log_error("Fragment assembly failed for dst:%s proto: %d",(char*)inet_ntoa(traffic->iphdr->ip_dst), frag->traffic->proto);
-			printf("BB\n");
 			free_frag_queue(frag_queue,1);
 		} else {
 			pthread_yield();
@@ -126,9 +128,10 @@ int push_ip_frag(struct traffic* traffic) {
 void ip_frag_cleaner() { 
 	struct timeval now;
 	Fqueue *fptr;
+	Fqueue *tptr;
 	int i;
 
-	//DEBUG(stdout, "In IP frag cleaner!\n");
+	DEBUG(stdout, "In IP frag cleaner!\n");
 
 	//dump_frag_queues ();
 	gettimeofday( &now, NULL );
@@ -139,8 +142,9 @@ void ip_frag_cleaner() {
 				if(now.tv_sec - fptr->time.tv_sec > FRAG_TIMEOUT) {
 					DEBUGF("Frag queue expired: %d\n",i);
 					stats_increase_cnt(CNT_IP_FRAG_TMOUT,1);
+					tptr = fptr;
 					fptr = fptr->next;
-					free_frag_queue(fqueue[i],1);
+					free_frag_queue(tptr,1);
 				} else {
 					fptr = fptr->next;
 				}
@@ -179,7 +183,7 @@ void dump_frag_queues () {
 		if(fqueue[i] == NULL || fqueue[i]->list == NULL) {
 			continue;
 		}
-		printf("Queue ID: %d Frag cnt: %d, required: %d, collected: %d\n",fqueue[i]->id,fqueue[i]->fragcnt, fqueue[i]->required, fqueue[i]->collected);
+		printf("Queue ID: %d (at: %d) Frag cnt: %d, required: %d, collected: %d\n",fqueue[i]->id,i,fqueue[i]->fragcnt, fqueue[i]->required, fqueue[i]->collected);
 		entry = fqueue[i]->list->start;
 		while ( entry != NULL) {
 			tmpfrag = (IPfrag*)entry->data;
@@ -261,7 +265,9 @@ int assemble_ip_frags(Fqueue* fragq) {
 	traffic->proto  = traffic->iphdr->ip_p;
 
 	//dumphex(datagram,fragq->required);
-	pushListEntry(traffic,trafficlist);
+        //TODO seperate transport header from data
+	stats_increase_cnt(CNT_IP_FRAG_REASS,1);
+	pushRingData(traffic,trafficlist);
         return 0;
 }
 
@@ -286,13 +292,13 @@ void free_frag_queue(Fqueue* fragq, int dispatch) {
 		} else{
 			frag->traffic->proto = 0;
 			DEBUG(stdout,"Pushing frag to list\n");
-			pushListEntry(frag->traffic,trafficlist);
+			pushRingData(frag->traffic,trafficlist);
 		}
 
 		stats_decrease_cnt(CNT_IP_FRAG_QUEUE,1);
 		freeMem(frag);
 		freeMem(entry);
-                entry = tmp;
+		entry = tmp;
         }
 
 	// End of list
@@ -307,6 +313,7 @@ void free_frag_queue(Fqueue* fragq, int dispatch) {
 		//First in list
 		if(qptr_next != NULL && qptr_prev == NULL) {
 			fqueue[fragq->id] = qptr_next;
+			fqueue[fragq->id]->prev = NULL;
 		}
 
 		//First in list

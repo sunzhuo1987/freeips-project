@@ -14,12 +14,12 @@ int CONFIG_LOG_STDOUT;		// default 1
 int CONFIG_LOG_PCAP;		// default 0
 int CONFIG_SHOW_TRAFFIC;	// default 0
 
+int CONFIG_RINGBUFFER_SIZE;     // default 500000
+
 char CONFIG_SIGFILE[CONFIG_MAX_CHAR];		// default "config/anti/" 
 char CONFIG_LOGDIR[CONFIG_MAX_CHAR];		// default "logdir/" 
 char CONFIG_PCAP_FILTER[CONFIG_MAX_CHAR];	// default "ip" 
 char CONFIG_PCAP_DEV[CONFIG_MAX_CHAR];   	// default "0" 
-
-int CONFIG_PACKET_BL_BUFFER;		   	// default 1000;
 
 int CONFIG_SIG_STRICT_LOAD;
 
@@ -49,17 +49,6 @@ unsigned long CONFIG_CONTROL_HTTP_IP;			// INADDR_ANY
 int CONFIG_TIMER_STATS;			// default 600
 int CONFIG_TIMER_TCP_CLEANER;		// default 3600
 int CONFIG_TIMER_IPFRAG_CLEANER;	// default 10
-int CONFIG_TIMER_CLEANUPPBUFFER;	// default 10
-
-// Set the maximum amount of payloads to be stored in memory.
-// this allows us to restrict memory usage. Set to the highest
-// value possible in order to prevent a performance decrease.
-//
-// In case you want a maximum of 512MB (aproximately)
-//
-
-int CONFIG_MAX_LIST_SIZE; 
-
 
 // Functions;
 

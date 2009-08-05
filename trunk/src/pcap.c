@@ -58,15 +58,10 @@ void pcap_callback(u_char *burb,const struct pcap_pkthdr* pkthdr,const u_char* p
 
 	// Put the packet in the traffic struct
 	struct traffic * traffic = pcap_to_traffic((void *)packet,pkthdr);
-
 	stats_increase_cnt(CNT_QUEUE_PUSH,1);
 
 	//Check IP fragmentation
 	if(ntohs(traffic->iphdr->ip_off) & IP_MF || ntohs(traffic->iphdr->ip_off) & IP_OFFMASK) {
-		// Make sure this traffic is not
-		// free'd without proper processing
-
-		traffic->free = 0;
 		push_ip_frag(traffic);
 		return;
 	} 
@@ -74,7 +69,12 @@ void pcap_callback(u_char *burb,const struct pcap_pkthdr* pkthdr,const u_char* p
 	traffic->type = TRAFFIC_TYPE_PCAP;
 
 	//TODO seperate transport header from data
-        pushListEntry(traffic,trafficlist);
+        while(pushRingData(traffic,trafficlist) != 0) {
+		//Ring buffer full
+		usleep(30000);
+		pthread_yield();
+	}
+
 	return;
 }
 

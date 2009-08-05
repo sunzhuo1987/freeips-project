@@ -127,8 +127,7 @@ int main(int argc, char **argv)  {
 
         // Create the list, this is to store the IP packets in which can then
         // be read by another thread. TODO: add maximum list size
-        trafficlist = getNewList();
-	setListSize(CONFIG_MAX_LIST_SIZE,trafficlist);
+        trafficlist = getRingBuffer(CONFIG_RINGBUFFER_SIZE);
 
         // Register the destructor
         registerListDestructor(destructor_callback,trafficlist);
@@ -146,7 +145,6 @@ int main(int argc, char **argv)  {
 	timer_register_function(CONFIG_TIMER_STATS,"Stats printer",stats_show_cnt_line,NULL);
 	timer_register_function(CONFIG_TIMER_TCP_CLEANER,"TCP session cleaner", tcp_clean_sessions,NULL);
 	timer_register_function(CONFIG_TIMER_IPFRAG_CLEANER,"IP fragment cleaner", ip_frag_cleaner,NULL);
-	timer_register_function(CONFIG_TIMER_CLEANUPPBUFFER,"Packet list cleaner", cleanListBacklog, (void*)trafficlist);
 
 	//Load the signatures
 	if(load_signatures(CONFIG_SIGFILE) == -1){
@@ -224,9 +222,6 @@ int main(int argc, char **argv)  {
 	// Control thread
 	loop_control = 0;
 	pthread_join(t_control, NULL);
-
-        // Free the list.
-        freeList(trafficlist,1);
 
 	// And bail out
 	dump_stats(stdout);

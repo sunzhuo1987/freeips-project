@@ -10,9 +10,7 @@
 	<inlineport>2222</inlineport>
 
 	<!-- how many packets to store in memory -->
-	<packetbuffer>500000</packetbuffer>
-	<!-- how many processed packets to keep in memory -->
-	<packetblbuffer>1000</packetblbuffer>
+	<ringbuffer>800000</ringbuffer>
 
 	<security>
 		<run_as_user enable="1">nobody</run_as_user>
@@ -34,7 +32,7 @@
 		<filename>./logdir/info.log</filename>
 	</logfile>
 
-	<dump_packet enable="0">
+	<dump_packet enable="1">
 		<output_dir>./logdir/</output_dir>
 	</dump_packet>
   </logging>
@@ -50,7 +48,7 @@
 	<timer>
 		<print_stats>1</print_stats>
 		<cleanup_tcp>3600</cleanup_tcp>
-		<cleanup_ipfrags>10000</cleanup_ipfrags>
+		<cleanup_ipfrags>10</cleanup_ipfrags>
 		<cleanup_packetbuffer>3</cleanup_packetbuffer>
 	</timer>
   </control_thread>

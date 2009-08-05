@@ -8,17 +8,6 @@
 #endif
 
 //
-// The AP info struct
-//
-
-struct ap_list_entry {
-     char first_time[28];
-     char last_time[28];
-     struct wi_apinfo *value;
-     char mac[18];
-};
-
-//
 // Generic list entry struct. This struct contains a 
 // pointer to the actual data that was added to the 
 // list
@@ -32,7 +21,6 @@ struct list_entry {
 	void *data;
 	struct list_entry *next;
 	struct list_entry *prev;
-	int popped;
 	int hits;
 	unsigned int id;
 };
@@ -50,6 +38,7 @@ struct linked_list {
 	struct session_handler *session_handler;
 	int entry_max;
 	int entry_cnt;
+	int data_cnt;
 	int backlog_max; // defined how much entries are to be kept in
         int backlog_cnt; // memory maximum before getting released in memory
 	unsigned int id;
@@ -75,7 +64,6 @@ struct linked_list *getNewList();
 int pushListEntry (void *data, struct linked_list* list);
 void * popListEntry(struct linked_list* list);
 void * getListEntry(unsigned int id, struct linked_list* list );
-void   cleanListBacklog(void *arg);
 void * popListEntryPtr(struct linked_list* list);
 //void iterateListCallback (int (*callback)(struct list_entry*) , struct linked_list* list);
 void iterateList (struct linked_list* list);
@@ -96,5 +84,9 @@ void setListSize(int maxsize, struct linked_list *list);
 void removeEntry(struct list_entry* entry,struct linked_list* list);
 int pushListEntryBack (void *data, struct linked_list* list);
 struct linked_list * newLiteList();
+struct linked_list * getRingBuffer(int entries);
+int pushRingData(void *data, struct linked_list* list);
+void * popRingData(struct linked_list* list);
+
 
 #endif

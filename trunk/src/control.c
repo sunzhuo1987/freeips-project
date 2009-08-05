@@ -324,9 +324,9 @@ int handle_connection(int clientfd) {
 			case '4':
 				send_http_response(clientfd,HTTP_TYPE_HTML,"");
 				write_file_to_fd(fsock,CONFIG_CONTROL_HTTP_HEADER);
-				if(is_file(logfiles[LOG_TYPE_ALERT].name)) {
+				if(is_file(logoutputs[LOG_TYPE_ALERT].name)) {
 					fprintf(fsock, "<pre>\n");
-					write_file_to_fd(fsock,logfiles[LOG_TYPE_ALERT].name);
+					write_file_to_fd(fsock,logoutputs[LOG_TYPE_ALERT].name);
 					fprintf(fsock, "</pre>\n");
 				} else {
 					fprintf(fsock, "Nothing to report (yet)\n");
