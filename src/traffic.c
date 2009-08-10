@@ -104,6 +104,9 @@ struct traffic * pcap_to_traffic(void *packet, const struct pcap_pkthdr* pkthdr)
         traffic->latency   = 0;
         traffic->icmphdr = NULL;
 
+	traffic->http_uri = NULL;
+        traffic->http_processed = 0;
+
 	return traffic;
 }
 

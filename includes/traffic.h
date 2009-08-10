@@ -32,6 +32,13 @@ typedef struct traffic {
         long    hashkey;
 	time_t  latency;
 
+	// Todo: generalize processed content
+	// references. 
+
+	int http_processed;
+	int http_present;;
+	char *http_uri;
+
 	// If set to 1 anywhere during processing -> drop packet
 	int drop;
 } Traffic;

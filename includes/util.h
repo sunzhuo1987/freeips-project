@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <wctype.h>
 #include <string.h>
+#include <netinet/in_systm.h>
 #include <netinet/in.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
