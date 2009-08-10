@@ -36,6 +36,21 @@ int hook_uricontent(struct signature *sig,struct traffic *traffic) {
 	char *tmp,*ptr,*uri,*request;
 	int uritype = 0;
 
+	// If already looked at, and no URI is present.. then just
+	// "forget about it"
+	if(traffic->http_processed == 1 && traffic->http_uri == NULL) {
+		return 0;
+	}
+
+	// If URI is already available, go and compare immediate
+	// instead of doing all the processing..
+	if(traffic->http_uri != NULL) {
+		return payload_compare(sig,traffic->http_uri,strlen(traffic->http_uri),TYPE_URICONTENT);
+	}
+
+	// Set the processed flag
+	traffic->http_processed = 1;
+
 	// Rediculous size..
 	if(traffic->psize < 0) {
 		return 0;
@@ -64,7 +79,6 @@ int hook_uricontent(struct signature *sig,struct traffic *traffic) {
 
 	//Crawl to the first G P C or H
 	while(*ptr != 'G' && *ptr != 'P' && *ptr != 'C' && *ptr != 'H') {
-
 		//printf("In loop ptr %c!\n",*ptr);
 		// And continue;
 		if(++ptr == NULL) {
@@ -111,6 +125,8 @@ int hook_uricontent(struct signature *sig,struct traffic *traffic) {
 		//printf("got also: %s\n",ptr);
 		ptr = strtok(NULL, "\r\n");
 	}
+
+	traffic->http_uri = uri;
 
 	// Ok and now the processing can start.  First the content needs to
 	// be normalized before doing a signature match.
