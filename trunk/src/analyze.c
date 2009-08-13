@@ -32,6 +32,8 @@ extern int loop_analyzer;
 extern int mode_offline;
 extern int loop_sniffer;
 extern struct linked_list *trafficlist;
+struct timeval shutdowntime;
+
 
 //
 // Analyze the packets
@@ -64,6 +66,7 @@ void pcap_analyzer() {
                         traffic_analyzer(traffic,packet);
                 }
         }
+        gettimeofday(&shutdowntime,NULL);
 
 	DEBUG(stdout,"Analyzer thread is finished\n");
         pthread_exit(0);

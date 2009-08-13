@@ -596,6 +596,8 @@ int init_signature_indexes() {
 	if(make_signature_indexes(P_UDP,SIG_INDEX_UDP_SRC,SIG_INDEX_UDP_DST) == 0) {
 		log_info("Created index for signatures: type UDP ");
 	}
+	
+	//printf("AA: %d\n",make_signature_index_conkey(80,SIG_INDEX_TCP_DST));
 
 	return 0;
 }
@@ -629,6 +631,37 @@ void dump_signature_index(struct signature* src_ptr[]) {
 		}
 	}
 }
+
+//
+// Make signature content key
+//
+
+int make_signature_index_conkey (int port, struct signature* src_ptr[]) {
+
+	struct payload_opts *popts;
+	struct signature* sptr = src_ptr[port];
+	int conkey = 0;
+	while(sptr != NULL) {
+		if(sptr->uricontent[0] != NULL) {
+			popts = (struct payload_opts*)sptr->uricontent[0];
+
+			if(conkey == 0) {
+				printf("Char: %c\n",popts->matchstr[0]);
+				conkey = (int)popts->matchstr[0];
+				printf("Char: %c %d\n",conkey,conkey);
+			} else {
+
+					printf("Char: %c\n",popts->matchstr[0]);
+					conkey = conkey | popts->matchstr[0];
+			}
+		}
+
+		sptr = sptr->next;
+	}
+
+	return conkey;
+}
+
 
 // 
 // Function for making TCP and UDP index tables
@@ -1015,6 +1048,9 @@ struct signature * getSignatureStruct() {
 
 		for(i=0;i < SIG_MAX_CONTENT;i++) 
 			sigstruct->uricontent[i] = NULL;
+
+		for(i=0;i < SIG_MAX_BYTETEST;i++) 
+			sigstruct->byte_test[i] = NULL;
 
 		for(i=0;i <DETECT_HOOK_MAX_CNT;i++) 
 			sigstruct->DetectHooks[i] = NULL;

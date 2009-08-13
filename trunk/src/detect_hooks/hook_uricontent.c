@@ -35,6 +35,7 @@ int hook_uricontent(struct signature *sig,struct traffic *traffic) {
 
 	char *tmp,*ptr,*uri,*request;
 	int uritype = 0;
+	stats_increase_cnt(CNT_HTTP_ALL,1);
 
 	// If already looked at, and no URI is present.. then just
 	// "forget about it"
@@ -45,11 +46,15 @@ int hook_uricontent(struct signature *sig,struct traffic *traffic) {
 	// If URI is already available, go and compare immediate
 	// instead of doing all the processing..
 	if(traffic->http_uri != NULL) {
+		stats_increase_cnt(CNT_HTTP_ALL,1);
 		return payload_compare(sig,traffic->http_uri,strlen(traffic->http_uri),TYPE_URICONTENT);
 	}
 
+	// Basicly this is the pre-processing..
 	// Set the processed flag
+
 	traffic->http_processed = 1;
+	stats_increase_cnt(CNT_HTTP_PROCESSED,1);
 
 	// Rediculous size..
 	if(traffic->psize < 0) {

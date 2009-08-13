@@ -1,3 +1,1 @@
-alert tcp $EXTERNAL_NET any -> $HOME_NET 3128 (msg:"content test"; content:"test";  sid:1388; rev:14;)
-alert tcp $EXTERNAL_NET any -> $HOME_NET 3128 (msg:"content woop"; content:"woop";  sid:1389; rev:14;)
-alert tcp $EXTERNAL_NET any -> $HOME_NET 3128 (msg:"content waap"; content:"waap";  sid:1389; rev:14;)
+alert tcp $EXTERNAL_NET any -> $HOME_NET 80 (msg:"content waap";   uricontent:"ABC"; content:"test"; sid:1389; rev:14;)

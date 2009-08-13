@@ -2,7 +2,7 @@
 #define __STATS_H
 
 #define MAX_PORT 65535
-#define MAX_CNTS 100
+#define MAX_CNTS 200
 #define STATS_INTERVAL 600
 
 //TODO --> array of structs, with description per struct?
@@ -48,6 +48,8 @@ unsigned long stat_cnts[MAX_CNTS];
 #define CNT_QUEUE_PUSH		90
 #define CNT_QUEUE_POP		91
 
+#define CNT_HTTP_PROCESSED	100
+#define CNT_HTTP_ALL		101
 
 
 
