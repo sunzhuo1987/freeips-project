@@ -92,6 +92,7 @@
 #include <hook_latency.h>
 #include <hook_icmp_itype.h>
 #include <hook_icmp_icode.h>
+#include <hook_byte_test.h>
 
 
 int compare(struct signature *sig, struct traffic *traf);

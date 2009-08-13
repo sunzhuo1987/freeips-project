@@ -30,6 +30,7 @@
 
 struct timeval tm_now;
 struct timeval tm_last;
+extern struct timeval shutdowntime;
 extern struct linked_list *trafficlist;
 extern struct linked_list *logqueue;
 int lastdata = 0;
@@ -86,10 +87,9 @@ void stats_show_cnt_line() {
 
 void dump_stats(FILE *fd) {
 
-	gettimeofday( &tm_now, NULL );
 
 	char *rname = "kbps";
-	int secondsrunning = tm_now.tv_sec - startuptime.tv_sec;
+	int secondsrunning = shutdowntime.tv_sec - startuptime.tv_sec;
 	float rate = ((stat_get(CNT_IP_DATA_SIZE) * 8) / 1024) / secondsrunning;
 
 	if(rate > 1024) {
@@ -133,6 +133,9 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"\n");
 	fprintf(fd,"Queue push        %d\n",stat_get(CNT_QUEUE_PUSH));
 	fprintf(fd,"Queue pop         %d\n",stat_get(CNT_QUEUE_POP));
+	fprintf(fd,"\n");
+	fprintf(fd,"HTTP processed    %d\n",stat_get(CNT_HTTP_PROCESSED));
+	fprintf(fd,"HTTP packets      %d\n",stat_get(CNT_HTTP_ALL));
 	fprintf(fd,"\n");
 	fprintf(fd,"Average bytes     %3.2f (%s)\n",rate,rname );
 	fprintf(fd,"Average packets   %d (p/s)\n",stat_get(CNT_IP) / secondsrunning );

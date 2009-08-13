@@ -54,6 +54,7 @@ void detect_hook_init() {
 	detect_hook_register("ip_id"     ,0, HOOK_PRIO_HIGH,   hook_ip_id,hook_ip_id_options);
 	detect_hook_register("ip_ttl"    ,0, HOOK_PRIO_HIGH,   hook_ip_ttl,hook_ip_ttl_options);
 	detect_hook_register("ip_tos"    ,0, HOOK_PRIO_HIGH,   hook_ip_tos,hook_ip_tos_options);
+	detect_hook_register("ip_proto"  ,0, HOOK_PRIO_HIGH,   hook_ip_proto,hook_ip_proto_options);
 	detect_hook_register("p0f"       ,0, HOOK_PRIO_LOW,    hook_p0f,hook_p0f_options);
 	detect_hook_register("dsize"     ,0, HOOK_PRIO_HIGH,   hook_dsize,hook_dsize_options);
 	detect_hook_register("socom"     ,0, HOOK_PRIO_LOW,    hook_socom,hook_socom_options);
@@ -64,6 +65,7 @@ void detect_hook_init() {
 	detect_hook_register("ack"       ,0, HOOK_PRIO_HIGH,   hook_tcp_ack,hook_tcp_ack_options);
 	detect_hook_register("itype"     ,0, HOOK_PRIO_HIGH,   hook_icmp_itype,hook_icmp_itype_options);
 	detect_hook_register("icode"     ,0, HOOK_PRIO_HIGH,   hook_icmp_icode,hook_icmp_icode_options);
+	detect_hook_register("byte_test" ,0, HOOK_PRIO_NORMAL, hook_byte_test,hook_byte_test_options);
 
 }
 

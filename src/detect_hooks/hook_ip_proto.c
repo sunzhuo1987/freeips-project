@@ -32,7 +32,7 @@
 
 int hook_ip_proto(struct signature *sig,struct traffic *traffic) {
 
-	// Compare the TTLs
+	// Compare the Proto
 	if(traffic->proto == sig->ip_proto) {
 		return 0;
 	}
@@ -52,7 +52,6 @@ int hook_ip_proto_options(char *key, char *val, struct signature *sig) {
 		return 1;
 	}
 		
-	printf("Proto ---> %d\n",proto);
 	sig->ip_proto  = proto;
 
 	return 0;

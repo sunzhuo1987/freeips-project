@@ -50,6 +50,8 @@
 #define SIG_ACTION_DROP 1
 #define SIG_ACTION_PASS 2
 #define SIG_MAX_CONTENT 16
+#define SIG_MAX_BYTETEST 10
+
 #define SIG_INDEX_SIZE  65535 + 1
 
 struct linked_list *siglist;
@@ -83,6 +85,8 @@ struct signature {
         struct content *content[SIG_MAX_CONTENT];
         struct uricontent *uricontent[SIG_MAX_CONTENT];
 	struct payload_opts *popts;
+
+        struct byte_test *byte_test[SIG_MAX_BYTETEST];
 
         char *classtype;
         char *reference;
@@ -158,6 +162,8 @@ int make_signature_indexes (int proto, struct signature* src_ptr[], struct signa
 
 int init_signature_indexes();
 void dump_signature_index(struct signature* src_ptr[]);
+int make_signature_index_conkey (int port, struct signature* src_ptr[]);
+
 
 
 #endif 

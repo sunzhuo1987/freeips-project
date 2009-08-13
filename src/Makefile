@@ -16,6 +16,8 @@ PROGNAME=FreeIPS
 
 all:   
 	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} -lpcap
+prof:   
+	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -pg -o ${PROGNAME} ${SRCS} -lpcap
 pcap:
 	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} 
 debug:   

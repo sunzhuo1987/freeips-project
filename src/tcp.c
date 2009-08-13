@@ -69,6 +69,9 @@ int tcp_stream_add(struct traffic *traffic) {
 	tcp_stream_dump(tsess,stdout);
 #endif
 	setHashEntry(session,traffic,tsess);
+
+	stats_increase_cnt(CNT_SESSION_TOTAL,1);
+
 	return 0;
 }
 
