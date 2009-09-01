@@ -27,6 +27,8 @@ typedef struct traffic {
         struct signature *signature;
         void    *data;
         void    *payload;
+	int	poffset;
+
         int     dsize;
         int     psize;
         long    hashkey;

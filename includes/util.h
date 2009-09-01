@@ -109,6 +109,7 @@ int is_file(char *file);
 int is_dir(char *file);
 int payload_compare(struct signature *sig, char *data, int psize,int ptype);
 int base64_encode(char *input,char *output) ;
+int new_payload_compare(struct signature *sig, struct traffic* traf,struct payload_opts *popts);
 
 
 
