@@ -285,6 +285,100 @@ void sighup_handler () {
 //	pthread_create(&t_control,NULL,(void*)control_loop,NULL);
 }
 
+
+//
+// String match routing, used by uricontent and content
+//
+// 0 --> no match possible (e.g. error)
+// 1 --> match  
+// 2 --> no match
+
+int new_payload_compare(struct signature *sig, struct traffic* traf,struct payload_opts *popts) {
+
+        int i,strfound = 0, breakbool = 0;
+
+	char *payload = (char *)traf->payload;
+
+	// Always assume we start from the first byte
+        int offset=0;
+
+	// If there is an offset defined in the signature then
+	// we apply it (offset is always relative from byte 0
+
+	if(popts->offset > 0) {
+		if(popts->offset >= traf->psize) {
+			DEBUG(stdout,"Offset exceeds data size");
+			return 0;
+		}
+		offset = popts->offset;
+	}
+
+	// Distance if an offset that is relative to the 
+	// last match.. overwrites the above. which is pretty ugly
+
+	if(popts->distance != -1)
+		offset = traf->poffset + popts->distance;
+	if(popts->within != -1)
+		offset = traf->poffset;
+
+	DEBUGF("Going to inspect %d bytes\n",psize);
+	strfound = CONTENT_TEST_NOT_FOUND;
+	for (i=offset; i<(traf->psize - popts->matchstr_size) + 1 && breakbool == 0 ;i++) {
+
+		if(popts->distance != -1)
+			breakbool = 1;
+
+		// If depth was used then only look the amount of bytes
+		// as specified by it
+
+		if(popts->depth > 0 && popts->depth > i)
+			return 0;
+
+		// within check (todo: abuse depth?)
+		// If 'i' is larger then i + within then the
+		// next string is not within "within" bytes ;p
+		if(popts->within != -1 && i > (traf->poffset + popts->within)){
+			return 0;
+		}
+
+		// Not a possible start? -> revise
+		if(popts->nocase != 1 && payload[i] != ((char *)popts->matchstr)[0]) {
+				continue;
+		} else if(popts->nocase == 1 && tolower(payload[i]) != tolower(((char *)popts->matchstr)[0])) {
+				continue;
+		}
+
+		// Check if the is data at "isdataat", relatively to the point
+		// of the last match. isdataat without "relative" is not supported and
+		// can be replaced with dsize.
+
+		//printf("if(%d != -1 && %d < %d)\n",popts->isdataat,(traf->psize - (i + popts->matchstr_size)),popts->isdataat);
+		if(popts->isdataat != -1 && (traf->psize - (i + popts->matchstr_size)) < popts->isdataat) {
+			return 0;
+		}
+
+		// Match?
+		if(mymemcmp(payload + i,popts->matchstr,popts->matchstr_size,popts->nocase) == 0) {
+
+			// Continue searching ater match
+			i = (i + popts->matchstr_size);
+
+			// Last matchpointer
+			traf->poffset = i;
+			strfound = CONTENT_TEST_FOUND;
+			break;
+		}
+	}
+
+	if(popts->test == strfound)
+		return 1;
+
+	// No match
+	return 0;
+}
+
+
+
 //
 // String match routing, used by uricontent and content
 //

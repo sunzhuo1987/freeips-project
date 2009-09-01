@@ -83,6 +83,8 @@ struct intvalue {
 struct signature {
         char *msg;
         struct content *content[SIG_MAX_CONTENT];
+	int content_idx;
+
         struct uricontent *uricontent[SIG_MAX_CONTENT];
 	struct payload_opts *popts;
 

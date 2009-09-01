@@ -34,9 +34,19 @@
 
 int hook_content(struct signature *sig,struct traffic *traffic) {
 
-        if(traffic->psize > 0 && payload_compare(sig,traffic->payload,traffic->psize,TYPE_CONTENT)) {
+	struct payload_opts *popts = (struct signature *) sig->content[sig->content_idx];
+
+	if(popts == NULL) {
+		fatal_error("Content reference not present, still requested: %d",sig->content_idx);
+	}
+
+	// Increase the index in case we get called again
+	sig->content_idx++;
+
+        if(new_payload_compare(sig,traffic,popts)) {
 		return 1;
 	}
+
 	return 0;
 }
 

@@ -50,7 +50,7 @@ void detect_hook_init() {
 	
 	detect_hook_register("pcre"      ,0, HOOK_PRIO_LOW,    hook_pcre,hook_pcre_options);
 	detect_hook_register("flow"      ,0, HOOK_PRIO_NORMAL, hook_flow,hook_flow_options);
-	detect_hook_register("content"   ,0, HOOK_PRIO_LOW,    hook_content,hook_content_options);
+	detect_hook_register("content"   ,0, HOOK_PRIO_NORMAL,    hook_content,hook_content_options);
 	detect_hook_register("ip_id"     ,0, HOOK_PRIO_HIGH,   hook_ip_id,hook_ip_id_options);
 	detect_hook_register("ip_ttl"    ,0, HOOK_PRIO_HIGH,   hook_ip_ttl,hook_ip_ttl_options);
 	detect_hook_register("ip_tos"    ,0, HOOK_PRIO_HIGH,   hook_ip_tos,hook_ip_tos_options);
@@ -170,7 +170,10 @@ DetectHook * detect_hook_link(struct signature *sig, char *name) {
 		if(sig->DetectHooks[count] == NULL) 		
 			break;
 
-		if(strcmp(sig->DetectHooks[count]->name,name) == 0)
+		// Return the existing hook if it already exists..
+		// not for content ! Todo: also not for uri content
+
+		if(strcmp(name,"content") != 0 && strcmp(sig->DetectHooks[count]->name,name) == 0)
 			return myhook;
 
 	}

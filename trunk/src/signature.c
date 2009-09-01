@@ -96,9 +96,9 @@ int load_signatures(char *sigfile) {
 			continue;
 		}
 
-#ifdef TCP_DEBUG_SIGNATURE
+//#ifdef TCP_DEBUG_SIGNATURE
 		dumpSignature(sigstruct);
-#endif
+//#endif
                 // Check if we need to initialize the new proto list
                 if(sigstruct->proto < SIG_ARRAY_SIZE && sigarray[sigstruct->proto] == NULL) {
                         DEBUGF("Initializing signature list for protocol: %d\n",sigstruct->proto);
@@ -332,6 +332,7 @@ int sigparse (char *string,struct signature *sig) {
 
 			//printf("KEY \"%s\" VAL: \"%s\"\n",buf, vptr);
                         if(parseOption(buf,vptr,sig) == 1) {
+				printf("parseOption error\n");
                                 return 1;
                         }
 
@@ -876,6 +877,10 @@ int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
 
 	stats_increase_cnt(CNT_SIG_TESTS,1);
 
+	// Set the payload offset to 0
+	// for relative processing
+	traffic->poffset = 0;
+
 	// Fire off the detection hooks
 	for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
 		if(sret->DetectHooks[count] == NULL)
@@ -903,23 +908,22 @@ int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
 
 void dumpSignature(struct signature *sig) {
 
-	//int i;
-	printf("\n\n ======> SID: %d\n",sig->sid);
+	int count;
+	printf("\n");
+	printf("SID: %d\n",sig->sid);
 	printf("Message:     %s\n",sig->msg);
-//	printf("Matchstr:    \"%s\"\n",sig->matchstr);
 
-	//for(i =0; i < sig->matchstr_size;i++) {
-//		printf("%x ",sig->matchstr[i]);
-//	}
-//	printf("\b\"\n");
+        for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
+                if(sig->DetectHooks[count] == NULL)
+                        break;
 
-	
+		printf("Hook: %s\n",sig->DetectHooks[count]->name);
+
+	}
+
 	printf("Proto:       %d\n",sig->proto);
-	printf("Srcport:     val: %d-%d neg: %d range: %d\n",sig->srcport.start,sig->srcport.stop,sig->srcport.neg, sig->srcport.range);
-	printf("Dstport:     val: %d-%d neg: %d range: %d\n",sig->dstport.start,sig->dstport.stop, sig->dstport.neg, sig->dstport.range);
-	//printf("Classtype:   %s\n",sig->classtype);
-	//printf("Conn state:  %s\n",sig->connection_state);
-
+	//printf("Srcport:     val: %d-%d neg: %d range: %d\n",sig->srcport.start,sig->srcport.stop,sig->srcport.neg, sig->srcport.range);
+	//printf("Dstport:     val: %d-%d neg: %d range: %d\n",sig->dstport.start,sig->dstport.stop, sig->dstport.neg, sig->dstport.range);
 }
 
 
@@ -927,7 +931,7 @@ int validateSignature(struct signature *sig) {
 	if(sig->msg == NULL)
 		return 1;
 
-	if(sig->proto == P_TCP || sig->proto == P_UDP || sig->proto == P_ICMP)
+	if(sig->proto == P_UNKNOWN || sig->proto == P_TCP || sig->proto == P_UDP || sig->proto == P_ICMP)
 		return 0;
 	
 	return 1;
@@ -1036,6 +1040,9 @@ struct signature * getSignatureStruct() {
 		sigstruct->srcport.stop  = -1;
 		sigstruct->srcport.range = 0;
 		sigstruct->srcport.neg   = 0;
+
+		// For content matching
+		sigstruct->content_idx = 0;
 
 		// Default actoin is drop. Todo: make this configurable
 		sigstruct->action = SIG_ACTION_DROP;
