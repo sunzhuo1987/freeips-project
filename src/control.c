@@ -30,6 +30,7 @@
 
 extern pthread_t t_analyzer;
 extern pthread_t t_control;
+extern struct timeval shutdowntime;
 extern int loop_control;
 extern int loop_analyzer;
 
@@ -207,7 +208,8 @@ void control_loop() {
 	struct sockaddr_in gaddr;
 	struct timeval seltimeout;
 	socklen_t sin_size = sizeof(struct sockaddr_in);
-	int count,sockfd,clientfd;
+	int count,clientfd;
+	int sockfd = -1;
 	fd_set sockset;
 
 	if(CONFIG_CONTROL_HTTP_ENABLE == 1) {
@@ -261,7 +263,9 @@ void control_loop() {
 		}
 	}
 
-	close(sockfd);
+	if(CONFIG_CONTROL_HTTP_ENABLE == 1) {
+		close(sockfd);
+	}
 }
 
 int handle_connection(int clientfd) {
@@ -301,6 +305,7 @@ int handle_connection(int clientfd) {
 				send_http_response(clientfd,HTTP_TYPE_HTML,"");
 				write_file_to_fd(fsock,CONFIG_CONTROL_HTTP_HEADER);
 				fprintf(fsock, "<pre>\n");
+				gettimeofday(&shutdowntime,NULL);
 				dump_stats(fsock);
 				fprintf(fsock, "</pre>\n");
 				write_file_to_fd(fsock,CONFIG_CONTROL_HTTP_FOOTER);

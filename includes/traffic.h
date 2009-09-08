@@ -38,7 +38,7 @@ typedef struct traffic {
 	// references. 
 
 	int http_processed;
-	int http_present;;
+	int http_present;
 	char *http_uri;
 
 	// If set to 1 anywhere during processing -> drop packet

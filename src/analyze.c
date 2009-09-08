@@ -42,7 +42,6 @@ struct timeval shutdowntime;
 void pcap_analyzer() {
 
         log_info("Analyzer thread started: accepting data");
-	struct list_entry *packet;
         struct traffic* traffic;
 
         while(loop_analyzer == 1) {
@@ -63,7 +62,7 @@ void pcap_analyzer() {
                         }
                 } else {
 			stats_increase_cnt(CNT_QUEUE_POP,1);
-                        traffic_analyzer(traffic,packet);
+                        traffic_analyzer(traffic,NULL);
                 }
         }
         gettimeofday(&shutdowntime,NULL);

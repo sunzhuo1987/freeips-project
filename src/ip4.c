@@ -198,7 +198,8 @@ int assemble_ip_frags(Fqueue* fragq) {
         IPfrag* tmpfrag;
         struct iphdr*   iphdr;
         struct traffic* traffic;
-        int ip_hl,all_h,dgsize;
+        int ip_hl,all_h;
+	int dgsize = 0;
         void *datagram = NULL;
         int processed = 0;
 

@@ -96,9 +96,9 @@ int load_signatures(char *sigfile) {
 			continue;
 		}
 
-//#ifdef TCP_DEBUG_SIGNATURE
+#ifdef TCP_DEBUG_SIGNATURE
 		dumpSignature(sigstruct);
-//#endif
+#endif
                 // Check if we need to initialize the new proto list
                 if(sigstruct->proto < SIG_ARRAY_SIZE && sigarray[sigstruct->proto] == NULL) {
                         DEBUGF("Initializing signature list for protocol: %d\n",sigstruct->proto);
@@ -239,6 +239,9 @@ int parseport(char *token, struct intvalue *port) {
 		//Todo
 		port->start = 0;
 		port->stop  = 65535;
+
+		// TODO: parse and make range = 1
+		//port->range = 1;
 		port->range = -1;
 	} else {
 		port->start = atoi(token);
@@ -332,7 +335,6 @@ int sigparse (char *string,struct signature *sig) {
 
 			//printf("KEY \"%s\" VAL: \"%s\"\n",buf, vptr);
                         if(parseOption(buf,vptr,sig) == 1) {
-				printf("parseOption error\n");
                                 return 1;
                         }
 
@@ -597,7 +599,7 @@ int init_signature_indexes() {
 	if(make_signature_indexes(P_UDP,SIG_INDEX_UDP_SRC,SIG_INDEX_UDP_DST) == 0) {
 		log_info("Created index for signatures: type UDP ");
 	}
-	
+
 	//printf("AA: %d\n",make_signature_index_conkey(80,SIG_INDEX_TCP_DST));
 
 	return 0;
@@ -615,20 +617,28 @@ void dump_signature_index(struct signature* src_ptr[]) {
 
 	for(i=0;i<SIG_INDEX_SIZE;i++) {
 
-		if(src_ptr[i] != NULL) {
+		count=0;
+		hits =0;
 
-			count = 1;
-			hits =0;
+		if(src_ptr[i] != NULL) {
 			sptr = src_ptr[i];
 
-			hits += sptr->hits;		
-			while(sptr->next != NULL) {
+			do {
 				count++;
 				hits += sptr->hits;		
-				sptr = sptr->next;
-			}
 
-			printf("PORT: %d Entries: %d Hits: %d \n",i,count,hits);
+				if(sptr->hits != 0) {
+	
+					printf("\t\t Hits:%d, Id:%d, Sport:%d-%d Dport:%d-%d Name: %s\n",sptr->hits,sptr->sid,sptr->srcport.start, sptr->srcport.stop,sptr->dstport.start, sptr->dstport.stop,sptr->msg);
+				}
+				sptr = sptr->next;
+
+			} while(sptr != NULL);
+
+
+			if(hits != 0) {
+				printf("PORT: %d Entries: %d Hits: %d \n",i,count,hits);
+			}
 		}
 	}
 }
@@ -780,15 +790,15 @@ struct signature* indexed_match_signature(struct traffic* traffic) {
 	}
 
 	// First look at the dst port index
-	sret = src_index;
+	sret = dst_index;
 	while(sret != NULL) {
 
 		// Check if the destination port also matches or bail out
-		if (sret->srcport.range == 0) {
-			if(sret->srcport.start != srcport)  
+		if (sret->dstport.range == 0) {
+			if(sret->dstport.start != dstport)  
 				return NULL;
-		} else if(sret->srcport.range != -1) { 
-			if(srcport < sret->srcport.start || srcport > sret->srcport.stop)
+		} else if(sret->dstport.range != 1) { 
+			if(dstport < sret->dstport.start || dstport > sret->dstport.stop)
 				return NULL;
 		}
 
@@ -807,7 +817,7 @@ struct signature* indexed_match_signature(struct traffic* traffic) {
 	// find rules with "any" as destinations.. if the rules here would have had an explicit or
 	// range port then they would have been dealt with in the above code.
 
-	sret = dst_index;
+	sret = src_index;
 	while(sret != NULL) {
 		stats_increase_cnt(CNT_SIG_TESTS_INDEX,1);
 		sret->hits++;
@@ -879,7 +889,9 @@ int compare_traffic_signature(struct traffic* traffic, struct signature* sret) {
 
 	// Set the payload offset to 0
 	// for relative processing
+
 	traffic->poffset = 0;
+	sret->content_idx = 0;
 
 	// Fire off the detection hooks
 	for(count=0; count<DETECT_HOOK_MAX_CNT;count++) {
@@ -931,7 +943,7 @@ int validateSignature(struct signature *sig) {
 	if(sig->msg == NULL)
 		return 1;
 
-	if(sig->proto == P_UNKNOWN || sig->proto == P_TCP || sig->proto == P_UDP || sig->proto == P_ICMP)
+	if(sig->proto == P_TCP || sig->proto == P_UDP || sig->proto == P_ICMP)
 		return 0;
 	
 	return 1;
@@ -1043,6 +1055,8 @@ struct signature * getSignatureStruct() {
 
 		// For content matching
 		sigstruct->content_idx = 0;
+		sigstruct->uricontent_idx = 0;
+		sigstruct->byte_test_idx = 0;
 
 		// Default actoin is drop. Todo: make this configurable
 		sigstruct->action = SIG_ACTION_DROP;

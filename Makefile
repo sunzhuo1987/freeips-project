@@ -11,6 +11,7 @@ list:
 clean:
 	cd src && rm -f FreeIPS *.o *.a tests/*.o tests/*.core *.core *.o *.so *.core
 	rm -f FreeIPS FreeIPS.core
+	rm -f logdir/*
 install:
 	cp FreeIPS ${PREFIX}/bin/
 	mkdir -p ${PREFIX}/share/FreeIPS

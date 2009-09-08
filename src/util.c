@@ -287,13 +287,14 @@ void sighup_handler () {
 
 
 //
-// String match routing, used by uricontent and content
+// String match routing, used by content
+// only
 //
 // 0 --> no match possible (e.g. error)
 // 1 --> match  
 // 2 --> no match
 
-int new_payload_compare(struct signature *sig, struct traffic* traf,struct payload_opts *popts) {
+int content_payload_compare(struct signature *sig, struct traffic* traf, struct payload_opts *popts) {
 
         int i,strfound = 0, breakbool = 0;
 

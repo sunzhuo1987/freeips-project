@@ -34,16 +34,17 @@
 
 int hook_content(struct signature *sig,struct traffic *traffic) {
 
-	struct payload_opts *popts = (struct signature *) sig->content[sig->content_idx];
+	struct payload_opts *popts = (struct payload_opts *) sig->content[sig->content_idx];
 
 	if(popts == NULL) {
-		fatal_error("Content reference not present, still requested: %d",sig->content_idx);
+		dumpSignature(sig);
+		fatal_error("Content reference not present, still requested: %d %s",sig->content_idx,sig->msg);
 	}
 
 	// Increase the index in case we get called again
 	sig->content_idx++;
 
-        if(new_payload_compare(sig,traffic,popts)) {
+        if(content_payload_compare(sig,traffic,popts)) {
 		return 1;
 	}
 
