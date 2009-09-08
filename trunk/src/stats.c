@@ -145,15 +145,7 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"Pkts not matching session %d (dropped)\n",stat_get(CNT_SESSION_MISS));
 	fprintf(fd,"--------------------------------------\n");
 
-//        printf("Dumping SIG_INDEX_TCP_DST\n");
- //       dump_signature_index(SIG_INDEX_TCP_DST);
-  //      printf("Dumping SIG_INDEX_TCP_SRC\n");
-   //     dump_signature_index(SIG_INDEX_TCP_SRC);
-    //    printf("Dumping SIG_INDEX_UDP_SRC\n");
-     //   dump_signature_index(SIG_INDEX_UDP_SRC);
-      //  printf("Dumping SIG_INDEX_UDP_DST\n");
-       // dump_signature_index(SIG_INDEX_UDP_DST);
-
-
+        #dump_signature_index(SIG_INDEX_TCP_DST);
+        #dump_signature_index(SIG_INDEX_TCP_SRC);
 }
 

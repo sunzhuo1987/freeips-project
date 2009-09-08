@@ -86,9 +86,11 @@ struct signature {
 	int content_idx;
 
         struct uricontent *uricontent[SIG_MAX_CONTENT];
-	struct payload_opts *popts;
+	int uricontent_idx;
 
         struct byte_test *byte_test[SIG_MAX_BYTETEST];
+	int byte_test_idx;
+	struct payload_opts *popts;
 
         char *classtype;
         char *reference;

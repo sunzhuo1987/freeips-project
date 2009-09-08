@@ -170,11 +170,13 @@ DetectHook * detect_hook_link(struct signature *sig, char *name) {
 		if(sig->DetectHooks[count] == NULL) 		
 			break;
 
-		// Return the existing hook if it already exists..
-		// not for content ! Todo: also not for uri content
+		// Of these, multiple are allowed
+		if(strcmp(name,"content") == 0  && strcmp(name,"uricontent") == 0) 
+				continue; 
 
-		if(strcmp(name,"content") != 0 && strcmp(sig->DetectHooks[count]->name,name) == 0)
-			return myhook;
+		// Return the existing hook if it already exists..
+		if(strcmp(sig->DetectHooks[count]->name,name) == 0)
+				return myhook;
 
 	}
 
