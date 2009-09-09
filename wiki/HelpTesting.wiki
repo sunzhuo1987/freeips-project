@@ -5,7 +5,7 @@
 
 All help and feedback is appriciated ! If you're interested to help out then<br>
 have a look at the instructions below.In the near future a vmware image will be made<br>
-available to make it even easier to experiment with the IDP.
+available to make it even easier to experiment with the IPS.
 
 If you run into any issues then please use the issues tab on this web site for<br>
 reporting them or contact me directly: niels[at]heinen.ws
