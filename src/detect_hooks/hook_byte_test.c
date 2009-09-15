@@ -217,7 +217,7 @@ int hook_byte_test_options(char *key, char *val, struct signature *sig) {
 					sig->byte_test[index]->number_type = BYTE_TYPE_OCT;
 					return 1; // todo
 				} else {
-					printf(" Huh ? default:%d \"%s\"\n",count,tptr);
+					//printf(" Huh ? default:%d \"%s\"\n",count,tptr);
 				}
 
 				break;
