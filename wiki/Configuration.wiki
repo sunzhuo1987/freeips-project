@@ -71,6 +71,8 @@ your needs.
   </control_thread>
 </config>
 
+}}}
+
 == Parameters explained ==
 
 ||*Parameter*||*Explanation*||
@@ -84,5 +86,4 @@ your needs.
 
 
 
-}}}
 
