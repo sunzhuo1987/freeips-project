@@ -1,20 +1,21 @@
 <?xml version="1.0"?>
 <config>
   <general>
-	<sigfile>/usr/local/share/snort/rules/</sigfile>
+	<sigfile>/usr/chroot/snort/rules/</sigfile>
 	<sigstrict>1</sigstrict>
 	<tcpstrict>1</tcpstrict>
 	<pcapfilter>ip</pcapfilter>
-	<pcapdevice>le0</pcapdevice>
+	<pcapdevice>em0</pcapdevice>
 	<inline>0</inline>
 	<inlineport>2222</inlineport>
 
-	<!-- how many processed packets to keep in memory -->
-	<packetbuffer>1000</packetbuffer>
+	<!-- how many packets to store in memory -->
+	<ringbuffer>10000</ringbuffer>
 
 	<security>
 		<run_as_user enable="1">nobody</run_as_user>
-		<chroot_dir  enable="0">/var/chroot</chroot_dir>
+		<chroot_dir  enable="1">/usr/chroot</chroot_dir>
+		<!-- If you chroot, make sure logdir is there -->
 	</security>
   </general>
 
@@ -23,6 +24,12 @@
 	<syslog>0</syslog>
 	<stdout>1</stdout>
 	<showtraffic>0</showtraffic>
+
+	<!--
+
+		All disabled in vmware ... ;-/
+
+	-->
 
 	<logfile enable="0" level="alert">
 		<filename>./logdir/alert.log</filename>
@@ -38,15 +45,18 @@
   </logging>
 
   <control_thread>
-	<http enable="1" port="3333"/>
-	<html_footer>support/html/footer.html</html_footer>
-	<html_header>support/html/header.html</html_header>
+	<http enable="1" port="3491">
+		<user>user</user>
+		<pass>pass</pass>
+	</http>
+	<html_footer>./support/html/footer.html</html_footer>
+	<html_header>./support/html/header.html</html_header>
 
 	<timer>
 		<print_stats>10</print_stats>
 		<cleanup_tcp>3600</cleanup_tcp>
 		<cleanup_ipfrags>10</cleanup_ipfrags>
-		<cleanup_packetbuffer>5</cleanup_packetbuffer>
+		<cleanup_packetbuffer>3</cleanup_packetbuffer>
 	</timer>
   </control_thread>
 </config>

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 clear
+PATH=$PATH:/usr/local/bin/
 
 #bring the interfaces up
 for int in `ifconfig -l`
@@ -8,21 +9,13 @@ do
  ifconfig $int up
 done
 
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-#echo ""
-echo ""
-echo "Starting FreeIPS in verbose mode.. use CTRL-C to quit"
-echo "then type 'FreeIPS' to start the IDS manually"
-echo ""
 #
-#
-cd /usr/local/share/FreeIPS/ && FreeIPS -c config/config.xml 
 
 
+cat /etc/motd
+
+/bin/sh 
+
+echo Shutting down
+
+halt -p
