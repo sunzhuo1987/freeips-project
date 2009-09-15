@@ -72,10 +72,15 @@ function clean_image() {
 	cp /usr/local/lib/libiconv.so.3 ${TMPMNT}/usr/lib/
 	cp /boot/*.4th ${TMPMNT}/boot/
 	cp motd ${TMPMNT}/etc/
-	mkdir -p ${TMPMNT}/usr/local/share/snort/rules/
-	mkdir -p /usr/local/share/ANTI/logdir/
-	chown nobody /usr/local/share/ANTI/logdir/
-	cp /usr/code/sigs/rules/*  ${TMPMNT}/usr/local/share/snort/rules/
+	mkdir -p ${TMPMNT}/usr/chroot/logdir
+	mkdir -p ${TMPMNT}/usr/chroot/snort/rules/
+	mkdir -p ${TMPMNT}/usr/chroot/support/html/
+	cp support/html/* ${TMPMNT}/usr/chroot/support/html/
+	chown nobody ${TMPMNT}/usr/chroot/logdir/
+
+	cp ./config.xml ${TMPMNT}/root/
+
+	cp /usr/code/sigs/rules/*  ${TMPMNT}/usr/chroot/snort/rules/
 
 	# Copy startup file
 	cp ${HERE}/${RCFILE} ${TMPMNT}/etc
@@ -109,16 +114,16 @@ function package() {
 
 	cd ${HERE}
 
-	mkdir /var/tmp/ANTI-${TIMESTAMP}/
-	cp ${BSDDIR}/${VMDISK} /var/tmp/ANTI-${TIMESTAMP}/
-	cp ${VMXFILE} /var/tmp/ANTI-${TIMESTAMP}/
+	mkdir /var/tmp/FreeIPS-${TIMESTAMP}/
+	cp ${BSDDIR}/${VMDISK} /var/tmp/FreeIPS-${TIMESTAMP}/
+	cp ${VMXFILE} /var/tmp/FreeIPS-${TIMESTAMP}/
 	cd  /var/tmp/
-	tar -zcvf ANTI-${TIMESTAMP}.tgz ANTI-${TIMESTAMP}/
-	cp ANTI-${TIMESTAMP}.tgz  ${RELEASEDIR}
+	tar -zcvf FreeIPS-${TIMESTAMP}.tgz FreeIPS-${TIMESTAMP}/
+	cp FreeIPS-${TIMESTAMP}.tgz  ${RELEASEDIR}
 	cd ${RELEASEDIR}
 }
 
-#build_tinybsd;
+build_tinybsd;
 mount_image;
 clean_image;
 build_freeips;

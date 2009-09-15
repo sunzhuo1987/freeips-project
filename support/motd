@@ -11,19 +11,17 @@
 
 
 
-          ----------------------------------------
-          Welcome to this FreeIPS IDP vmware image !
-          ----------------------------------------
+           ----------------------------------------
+             Welcome to this FreeIPS vmware image
+           ----------------------------------------
 
 In vmware, make sure that you have bridged your active interface
 with the vmware interface so that FreeIPS can actually see some traffic
+The following command should probably get you started. If not: check the
+config.xml file and modify it (use /tmp) or run FreeIPS with -h to see
+what other command-line options are available.
 
-The following command should probably be get you started. If not
-then have a look at the config.xml file and change the interface name
-
-# cd /usr/local/share/FreeIPS/
-# FreeIPS -c config/config.xml
-
+# FreeIPS -c /root/config.xml
 
 
 
