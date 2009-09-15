@@ -1,19 +1,19 @@
 #summary This page summarizes how FreeIPS works
 
 
-= Introduction =
+= Summary =
 
+FreeIPS is multithreaded and each thread has it task.  The below
+picture shows how the threads communicate and how packets go trough
+the IPS.  A sniffer thread listens on a interface or reads data
+from a file. The packets read this way are pushed into into a
+ringbuffer in memory. In paralel, the analyzer thread reads the
+packets from the ringbuffer and does the signature matching.
 
+http://freeips-project.googlecode.com/svn/wiki/images/freeips_how_it_works.jpg
 
-FreeIPS is multithreaded and this should limit the amount of data copies as much as possible. 
+= Detailed description =
 
-
-
-
-Add your content here.
-
-
-= Details =
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
