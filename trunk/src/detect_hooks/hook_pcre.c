@@ -56,7 +56,9 @@ int compile_pcre (PcreRegex *regex, char *string) {
 	int erroroffset;
 
 	if((string = prepare_pcre_string(regex,string)) == NULL ) {
-		log_error("Unable to prepare PCRE string");
+		if(CONFIG_LOG_VERBOSE > 1)
+			log_error("Unable to prepare PCRE string");
+
 		return 1;
 	}
 

@@ -155,7 +155,7 @@ int main(int argc, char **argv)  {
 	// Make signature index;
 	init_signature_indexes();
 
-	log_info("Loaded signature count: %d", sigcount);
+	log_info("Signatures loaded: %d, not loaded: %d", stat_get(CNT_SIG_LOADED), stat_get(CNT_SIG_NOT_LOADED));
 
 
 	// Check if root privileges are required

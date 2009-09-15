@@ -82,6 +82,7 @@ int load_signatures(char *sigfile) {
 				log_warn("Signature error #%d: %s\n",lcount,sigline);
 			}
 			freeMem(sigstruct);
+			stats_increase_cnt(CNT_SIG_NOT_LOADED,1);
 			continue;
 		}
 
@@ -316,7 +317,9 @@ int sigparse (char *string,struct signature *sig) {
 			}
 
 			if(count > MAX_SIG_PART_SIZE) { 
-				log_error("Signature parsing error (max buf size reached)");
+				if(CONFIG_LOG_VERBOSE > 2) {
+					log_error("Signature parsing error (max buf size reached)");
+				}
 				return 1;
 			}
 
@@ -382,7 +385,9 @@ int parseOption(char *name, char *val, struct signature *sig) {
 			// Link the detection hook
 			if((hook = detect_hook_link(sig,name)) != NULL) {
 				if(hook->hook_parse_option(name,cleanup_char(val),sig) == 1) {
-					log_error("Signature parsing error: %s (%s)",sig->msg,name);
+					if(CONFIG_LOG_VERBOSE > 1) {
+						log_error("Signature parsing error: %s (%s)",sig->msg,name);
+					}
 					return 1;
 				}
 
@@ -458,7 +463,9 @@ int parseOption(char *name, char *val, struct signature *sig) {
 			// Todo, this error is not correct.. well atleast not
 			// from a Snort perspective (usage of isdataat in conjunction with
 			// distance 
-			log_error("isdataat without relative.. use dsize instead");
+			if(CONFIG_LOG_VERBOSE > 1) {
+				log_error("isdataat without relative.. use dsize instead");
+			}
 			return 1;
 		}
 

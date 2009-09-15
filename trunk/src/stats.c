@@ -116,6 +116,7 @@ void dump_stats(FILE *fd) {
 	fprintf(fd,"Total data        %d MB\n",stat_get(CNT_IP_DATA_SIZE) / (1024 * 1024));
 	fprintf(fd,"Sig match         %d\n",stat_get(CNT_SIG_MATCH));
 	fprintf(fd,"Sig count         %d\n",stat_get(CNT_SIG_LOADED));
+	fprintf(fd,"Sig not loaded    %d\n",stat_get(CNT_SIG_NOT_LOADED));
 	fprintf(fd,"Sig tests total   %d\n",stat_get(CNT_SIG_TESTS));
 	fprintf(fd,"Sig tests indexed %d\n",stat_get(CNT_SIG_TESTS_INDEX));
 	fprintf(fd,"\n");
