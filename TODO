@@ -2,6 +2,7 @@
 Todo
 ----
 
+- MAJOR: Have a new look at logging and follow the logfile approach also for syslog, stdout , ..
 - MAJOR: If drop privileges is chosen, do a permission check on files and folders that need access
 	 so a decent error message can be given
 - MAJOR: add some of the easy Snort keywords support (like seq, window, etc)
@@ -27,6 +28,7 @@ Todo
 - Reloading of signatures: freeMem the allocated content strings (and uricontent)
 - amount of packets
 - detect_hooks: add protocol check in the options function and prevent loading if the protocol is not OK
+- sigcount cleanup
 
 
 
