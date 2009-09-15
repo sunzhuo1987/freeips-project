@@ -29,6 +29,7 @@ unsigned long stat_cnts[MAX_CNTS];
 #define CNT_SIG_LOADED		41
 #define CNT_SIG_TESTS		42
 #define CNT_SIG_TESTS_INDEX	43
+#define	CNT_SIG_NOT_LOADED	44
 
 #define CNT_IP_FRAG		51	
 #define CNT_IP_FRAG_TMOUT	52	
@@ -56,6 +57,7 @@ unsigned long stat_cnts[MAX_CNTS];
 void stats_increase_cnt(int id,int val);
 void stats_decrease_cnt(int id,int val);
 
+unsigned int stat_get(int id);
 void stats_show_cnt_line();
 void stats_dump_cnts();
 void stats_init();
