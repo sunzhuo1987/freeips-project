@@ -1,7 +1,7 @@
 #summary This page summarizes how FreeIPS works
 
 
-= Summary of the IPS =
+= Summary of how it works =
 
 FreeIPS is multithreaded and each thread has its task.  The picture
 shows how the threads communicate and how packets go trough the
