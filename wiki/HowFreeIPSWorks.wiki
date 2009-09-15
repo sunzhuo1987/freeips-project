@@ -1,4 +1,5 @@
 #summary This page summarizes how FreeIPS works
+#labels Featured,Phase-Design
 
 
 = Summary of how it works =
@@ -24,4 +25,3 @@ you some remote insight in statistics and log files. Via HTTP you can also
 force the IPS to reload signatures. The idea is that in the future the HTTP
 interface can be used for pushing configs and even cooler: communication
 between multiple FreeIPS's.  For example to share blacklists.
-
