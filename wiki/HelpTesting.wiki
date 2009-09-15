@@ -3,30 +3,24 @@
 
 = Introduction =
 
-All help and feedback is appriciated ! If you're interested to help out then<br>
-have a look at the instructions below.In the near future a vmware image will be made<br>
-available to make it even easier to experiment with the IPS.
 
-If you run into any issues then please use the issues tab on this web site for<br>
-reporting them or contact me directly: niels[at]heinen.ws
+== Compiling FreeIPS ==
 
-= Getting started =
-
-Before getting started: you'll need the following
+Before getting started, you'll need the following installed
 
   # FreeBSD 6.`*` or higher
   # Libxml2    (/usr/ports/textproc/libxml2)
   # libpcre    (/usr/ports/devel/pcre)
   # subversion (/usr/ports/devel/subversion)
 
-===Get the code===
+Fetch the code:<br>
  * svn checkout http://freeips-project.googlecode.com/svn/trunk/ freeips-project-read-only
 
-===Build the IDP===
+Build the IPS:<br>
  * cd freeips-project-read-only
  * make
 
-===Run the IDP===
+Running the IPS:<br>
   * ./FreeIPS -i "interface" -S "path to signatures>"
   * E.g: ../FreeIPS -i xl0 -S config/signatures/
 Alternatively, edit "config/config.xml" and set the interface, signature path and<br>
