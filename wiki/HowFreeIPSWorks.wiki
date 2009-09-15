@@ -3,9 +3,7 @@
 
 = Summary of how it works =
 
-FreeIPS is multithreaded and each thread has its task.  The picture
-shows how the threads communicate and how packets go trough the
-IPS.  
+FreeIPS is multithreaded and each thread has its task and this is shown in the picture below.
 
 http://freeips-project.googlecode.com/svn/wiki/images/freeips_how_it_works.jpg
 
