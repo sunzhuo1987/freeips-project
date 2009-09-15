@@ -83,6 +83,7 @@ your needs.
 ||pcapdevice||Network interface to read from.||
 ||inline||If set to 1: Inline mode is enabled and packets are read from DIVERT instead of the network interface||
 ||inlineport||This is in fact the DIVERT port. It should match with your IPFW rules||
+||ringbuffer||With this setting you can specify the ringbuffer size. This is the memory buffer thats created during startup of FreeIPS. In the buffer packets are being stored by the sniffer thread. Keep the buffer big and use this rule: the faster the network, the bigger the need for a large buffer. If there are larege amounts of traffic then at some points the analyzer thread cannot keep up with the sniffer. At that point the buffer should be able to store the packets until the analyzer catches up. ||
 
 
 
