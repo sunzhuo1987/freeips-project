@@ -1,4 +1,10 @@
 
+1) Make sure you have libxml and prce
+2) Make sure you're on FreeBSD
+3) Just type "Make" to build the IPS
+4) Edit "config/config.xml"
+5) Start with: ./FreeIPS -c config/config.xml
+
 Have fun ! Contact me for any questions / suggestions..
 
 http://code.google.com/p/freeips-project/
