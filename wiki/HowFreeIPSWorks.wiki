@@ -20,7 +20,7 @@ addition to these event, the control thread is responsible for handling
 messaging which means it will print alerts to screen, file or syslog.
 
 The control thread can also accept HTTP requests in order to provide
-you some remote insight in statistics, log files. Via HTTP you can also 
+you some remote insight in statistics and log files. Via HTTP you can also 
 force the IPS to reload signatures. The idea is that in the future the HTTP
 interface can be used for pushing configs and even cooler: communication
 between multiple FreeIPS's.  For example to share blacklists.
