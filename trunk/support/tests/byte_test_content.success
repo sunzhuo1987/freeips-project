@@ -1,0 +1,1 @@
+alert ip any any -> any any (msg:"EXPLOIT EIGRP prefix length overflow attempt"; ip_proto:88; reference:bugtraq,9952; reference:cve,2004-0176; reference:cve,2004-0367; classtype:attempted-admin; sid:2464; rev:7;)
