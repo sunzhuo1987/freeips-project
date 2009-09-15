@@ -8,10 +8,10 @@
 
 Before getting started, you'll need the following installed
 
-  # FreeBSD 6.`*` or higher
-  # Libxml2    (/usr/ports/textproc/libxml2)
-  # libpcre    (/usr/ports/devel/pcre)
-  # subversion (/usr/ports/devel/subversion)
+  * FreeBSD 6.`*` or higher
+  * Libxml2    (/usr/ports/textproc/libxml2)
+  * libpcre    (/usr/ports/devel/pcre)
+  * subversion (/usr/ports/devel/subversion)
 
 Fetch the code:<br>
  * svn checkout http://freeips-project.googlecode.com/svn/trunk/ freeips-project-read-only
