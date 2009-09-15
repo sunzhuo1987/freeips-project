@@ -71,6 +71,17 @@ your needs.
   </control_thread>
 </config>
 
+== Parameters explained ==
+
+||*Parameter*||*Explanation*||
+||sigfile||Location of the signature folder OR a single signature file. If you specify a folder then it will be read recursively (thus including subdirectories)||
+||sigstrict||If set to 1: Only signatures with fully supported by FreeIPS are loaded. If set to 0 then signatures with non-supported keywords are also loaded ||
+||tcpstrict||If set to 1: Drop TCP packets not part of a known session. When running in inline mode, this means that existing connections may be dropped during startup of the IPS||
+||pcapfilter||Specify the PCAP filter here||
+||pcapdevice||Network interface to read from.||
+||inline||If set to 1: Inline mode is enabled and packets are read from DIVERT instead of the network interface||
+||inlineport||This is in fact the DIVERT port. It should match with your IPFW rules||
+
 
 
 }}}
