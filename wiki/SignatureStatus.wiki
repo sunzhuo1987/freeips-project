@@ -50,7 +50,7 @@ These are payload specific
 ||urilen||<font color="Orange">Partially</font>||Work in progress||
 ||isdataat||<font color="green">yes</font>|| ||
 ||pcre||<font color="green">yes</font>||Snort modifiers need some work||
-||byte_test||<font color="red">No</font>|| ||
+||byte_test||<font color="Orange">Partially</font>|| ||
 ||byte_jump||<font color="red">No</font>|| ||
 ||ftpbounce||<font color="red">No</font>|| ||
 ||asn1||<font color="red">No</font>|| ||
