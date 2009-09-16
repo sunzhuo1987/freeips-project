@@ -31,11 +31,13 @@
 extern HashTable *session;
 extern DetectHook *DetectHooks[DETECT_HOOK_MAX_CNT];
 int siginit = 0;
-int sigcount = 0;
 
 // Load the signature list. Right now sort them per protocol in the signature array. The sigs can
 // then dynamicly be sorted on their *hits* to make sure we get the most popular signatures first
 // while iterating the list.
+//
+// 0 = success
+// 1 = failure
 
 int load_signatures(char *sigfile) {
 
@@ -60,12 +62,10 @@ int load_signatures(char *sigfile) {
 
 	if ((fp = fopen(sigfile, "r")) == NULL){
 		fprintf(stderr, "Unable to open file %s!\n", sigfile);
-		return -1;
+		return 1;
 	}
 
-	if(CONFIG_LOG_VERBOSE > 1) {
-		log_verbose("Parsing signature file: %s",sigfile);
-	}
+	log_verbose(VERBOSE_LEVEL2,"Parsing signature file: %s",sigfile);
 
 	while(fgets(sigline,MAX_SIG_LINE,fp) != NULL) {
 		ptr = sigline;
@@ -78,9 +78,9 @@ int load_signatures(char *sigfile) {
 		//DEBUGF("Going to process signature: %s\n",sigline);
 		sigstruct = getSignatureStruct();
 		if(sigparse(sigline,sigstruct) == 1) {
-			if(CONFIG_LOG_VERBOSE > 2) {
-				log_warn("Signature error #%d: %s\n",lcount,sigline);
-			}
+			// When signature support is decent, change this to
+			// log_warn which is always displayed.. until then supress
+			log_verbose(VERBOSE_LEVEL2,"Signature error #%d: %s\n",lcount,sigline);
 			freeMem(sigstruct);
 			stats_increase_cnt(CNT_SIG_NOT_LOADED,1);
 			continue;
@@ -90,9 +90,7 @@ int load_signatures(char *sigfile) {
 		sort_hooks(sigstruct);
 
 		if(validateSignature(sigstruct)) {
-			if(CONFIG_LOG_VERBOSE > 2) {
-				log_warn("Invalid signature at line %d: %s",lcount,sigline);
-			}
+			log_verbose(VERBOSE_LEVEL2,"Invalid signature at line %d: %s",lcount,sigline);
 			freeMem(sigstruct);
 			continue;
 		}
@@ -109,10 +107,9 @@ int load_signatures(char *sigfile) {
                 //DEBUGF("Read signature: %s \n",sigstruct->msg);
                 pushListEntry(sigstruct,sigarray[sigstruct->proto]);
 		stats_increase_cnt(CNT_SIG_LOADED,1);
-                sigcount++;
 	}
 
-	return sigcount;
+	return 0;
 }
 
 int freeSignatures() {
@@ -317,9 +314,7 @@ int sigparse (char *string,struct signature *sig) {
 			}
 
 			if(count > MAX_SIG_PART_SIZE) { 
-				if(CONFIG_LOG_VERBOSE > 2) {
-					log_error("Signature parsing error (max buf size reached)");
-				}
+				log_verbose(VERBOSE_LEVEL2,"Signature parsing error (max buf size reached)");
 				return 1;
 			}
 
@@ -385,9 +380,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 			// Link the detection hook
 			if((hook = detect_hook_link(sig,name)) != NULL) {
 				if(hook->hook_parse_option(name,cleanup_char(val),sig) == 1) {
-					if(CONFIG_LOG_VERBOSE > 1) {
-						log_error("Signature parsing error: %s (%s)",sig->msg,name);
-					}
+					log_verbose(VERBOSE_LEVEL1,"Signature parsing error: %s (%s)",sig->msg,name);
 					return 1;
 				}
 
@@ -463,9 +456,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
 			// Todo, this error is not correct.. well atleast not
 			// from a Snort perspective (usage of isdataat in conjunction with
 			// distance 
-			if(CONFIG_LOG_VERBOSE > 1) {
-				log_error("isdataat without relative.. use dsize instead");
-			}
+			log_verbose(VERBOSE_LEVEL2,"isdataat without relative.. use dsize instead");
 			return 1;
 		}
 
@@ -532,9 +523,7 @@ int parseOption(char *name, char *val, struct signature *sig) {
                 return 0;
         }
 
-	if(CONFIG_LOG_VERBOSE > 2) {
-		log_info("Unsupported option: %s --> %s\n",name,val);
-	}
+	log_verbose(VERBOSE_LEVEL3,"Unsupported option: %s --> %s\n",name,val);
 
 	if(CONFIG_SIG_STRICT_LOAD == 1) {
 		return 1;
@@ -635,11 +624,10 @@ void dump_signature_index(struct signature* src_ptr[]) {
 				hits += sptr->hits;		
 
 				if(sptr->hits != 0) {
-	
-					printf("\t\t Hits:%d, Id:%d, Sport:%d-%d Dport:%d-%d Name: %s\n",sptr->hits,sptr->sid,sptr->srcport.start, sptr->srcport.stop,sptr->dstport.start, sptr->dstport.stop,sptr->msg);
+					printf("\t\t Hits:%d, Id:%d, Sport:%d-%d Dport:%d-%d Name: %s\n",sptr->hits,sptr->sid,sptr->srcport.start, 
+						sptr->srcport.stop,sptr->dstport.start, sptr->dstport.stop,sptr->msg);
 				}
 				sptr = sptr->next;
-
 			} while(sptr != NULL);
 
 
@@ -673,7 +661,6 @@ int make_signature_index_conkey (int port, struct signature* src_ptr[]) {
 					conkey = conkey | popts->matchstr[0];
 			}
 		}
-
 		sptr = sptr->next;
 	}
 

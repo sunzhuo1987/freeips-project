@@ -73,6 +73,8 @@ function clean_image() {
 	cp /boot/*.4th ${TMPMNT}/boot/
 	cp motd ${TMPMNT}/etc/
 	mkdir -p ${TMPMNT}/usr/chroot/logdir
+	mkdir -p ${TMPMNT}/usr/chroot/etc/
+	cp chroot/etc/* ${TMPMNT}/usr/chroot/etc/
 	mkdir -p ${TMPMNT}/usr/chroot/snort/rules/
 	mkdir -p ${TMPMNT}/usr/chroot/support/html/
 	cp support/html/* ${TMPMNT}/usr/chroot/support/html/

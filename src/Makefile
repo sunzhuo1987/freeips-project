@@ -5,7 +5,7 @@
 
 CC=gcc
 CFLAGS=	-Wall -lcurses -lpcap -lthr `xml2-config --cflags` -DWITH_SYSLOG -DBLOCK_IP_FRAG_OVERLAP
-LIBS= -lpcre
+LIBS= -lpcre -lpcap
 LIBDIRS= -L. -L /usr/local/lib/ `xml2-config --libs`
 INCLUDES= -I. -I /usr/local/include/ -I ../includes/
 HASHTEST=testhash.c hash.c
@@ -14,16 +14,14 @@ SRCS= main.c traffic.c timer.c divert.c log.c util.c pcap.c signature.c ip4.c co
 PROGNAME=FreeIPS
 
 all:   
-	${CC} -O1 -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} -lpcap
+	${CC} -O1 -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} 
+	strip ${PROGNAME}
 optimal:
-	${CC} -O1 -march=prescott ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} -lpcap
+	${CC} -O1 -march=prescott ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} 
 	strip ${PROGNAME}
 prof:   
-	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -pg -o ${PROGNAME} ${SRCS} -lpcap
-pcap:
-	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -o ${PROGNAME} ${SRCS} 
+	${CC} -g ${LIBDIRS} ${LIBS} ${INCLUDES} ${CFLAGS} -pg -o ${PROGNAME} ${SRCS} 
 debug:   
-	#${CC} -g -ggdb ${LIBS} ${INCLUDES} ${LIBDIRS} ${CFLAGS} -o ${PROGNAME} ${SRCS}
 	${CC} -g -ggdb -DWITH_DEBUG -DTCP_SESSION_DEBUG ${LIBS} ${INCLUDES} ${LIBDIRS} ${CFLAGS} -o ${PROGNAME} ${SRCS}
 clean:
 	rm -f pcap *.o *.a tests/*.o tests/*.core *.core *.o *.so

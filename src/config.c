@@ -14,8 +14,8 @@
 // 3. The name of author may not be used to endorse or promote products
 //    derived from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+// THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRFreeIPSES,
+// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRFreeIPSES OF MERCHANTABILITY
 // AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 // THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 // EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
@@ -49,8 +49,8 @@ int init_config() {
 	CONFIG_DROP_PRIVILEGES = 1;
 	strncpy(CONFIG_USER,"nobody", CONFIG_MAX_CHAR);
 
-	strncpy(CONFIG_SIGFILE,"/usr/local/share/ANTI/config/signatures/", CONFIG_MAX_CHAR);
-	strncpy(CONFIG_LOGDIR,"/usr/local/share/ANTI/logdir/",CONFIG_MAX_CHAR);
+	strncpy(CONFIG_SIGFILE,"/usr/local/share/FreeIPS/config/signatures/", CONFIG_MAX_CHAR);
+	strncpy(CONFIG_LOGDIR,"/usr/local/share/FreeIPS/logdir/",CONFIG_MAX_CHAR);
 	strncpy(CONFIG_PCAP_FILTER,"ip",CONFIG_MAX_CHAR);
 	strncpy(CONFIG_PCAP_DEV,"0",CONFIG_MAX_CHAR);
 
@@ -501,20 +501,20 @@ void read_config(char *docname) {
 	doc = xmlParseFile(docname);
 	
 	if (doc == NULL ) {
-		fprintf(stderr,"Document not parsed successfully. \n");
+		fatal_error("Configuration was not parsed successfully.");
 		return;
 	}
 	
 	cur = xmlDocGetRootElement(doc);
 	
 	if (cur == NULL) {
-		fprintf(stderr,"empty document\n");
+		fatal_error("No content found in XML");
 		xmlFreeDoc(doc);
 		return;
 	}
 	
 	if (xmlStrcmp(cur->name, (const xmlChar *) "config")) {
-		fprintf(stderr,"document of the wrong type, root node != config");
+		fatal_error("Config is not formatted correct: root node != config");
 		xmlFreeDoc(doc);
 		return;
 	}
