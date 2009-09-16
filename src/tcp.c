@@ -61,7 +61,6 @@ int tcp_stream_add(struct traffic *traffic) {
 	tsess->stream        = NULL;
 	tsess->stream_size   = 0;
 	tsess->stream_pkts   = NULL;
-	tsess->latency       = 0;
 	tsess->timeout       = TCPS_TIMEOUT_INITIAL;
 
 #ifdef TCP_SESSION_DEBUG
@@ -151,28 +150,6 @@ int tcp_stream_check(struct traffic *traffic) {
 					//TODO check if ok
 
 					tsess->timeout = TCPS_TIMEOUT_CONNECTION;
-
-					if(traffic->latency == 0 || CONFIG_DIVERT_ENABLE != 1) {
-						break;
-					}
-
-					// Manipulation
-					//printf("new: %d tsess->latency %d -> traffic->latency %d\n",time(NULL),tsess->latency,traffic->latency);
-					if(tsess->latency != 0 && traffic->latency == 0) {
-						//Set latency
-						//printf("Setting latency on traffic: %d + %d\n", time(NULL), tsess->latency);
-						traffic->latency = time(NULL) + tsess->latency;
-						return 2;	
-					}
-
-					if(traffic->latency != 0) {
-						if(traffic->latency > time(NULL)) {
-							//printf("Keeping traffic in queue: %d > %d\n",traffic->latency,time(NULL));
-							return 2;
-						} 
-						// Else: traffic receives normal processing
-					}
-
 					break;
 			}
 			break;
@@ -234,7 +211,6 @@ void tcp_stream_dump(TcpSession *tsess, FILE *fd) {
 	fprintf(fd,"%s:%d",inet_ntoa(tsess->ip_dst),htons(tsess->th_dport));
         fprintf(fd," mins act: %d",(int)(endtime.tv_sec - tsess->starttime.tv_sec) / 60);
 	fprintf(fd," timeout %d secs (val: %d)",(int)(tsess->timeout  - (endtime.tv_sec - tsess->seentime.tv_sec)),tsess->timeout);
-	fprintf(fd,"latency: %d  state: ",tsess->latency);
 
 	switch(tsess->state) {
 		case TCPS_NEW:

@@ -32,7 +32,6 @@ typedef struct traffic {
         int     dsize;
         int     psize;
         long    hashkey;
-	time_t  latency;
 
 	// Todo: generalize processed content
 	// references. 
