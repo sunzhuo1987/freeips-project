@@ -99,11 +99,11 @@ int pop_message() {
 	if(msg->type == LOG_TYPE_ALERT) {
 
 		if(CONFIG_LOG_STDOUT == 1) {
-			if(CONFIG_LOG_VERBOSE > 1) {
+			if(CONFIG_LOG_VERBOSE > VERBOSE_LEVEL1) {
 				// Show some more info..
 				traffic_dump(msg->traffic);
 			}
-			if (CONFIG_LOG_VERBOSE > 2) {
+			if (CONFIG_LOG_VERBOSE > VERBOSE_LEVEL2) {
 				// Show REALLY some more info...
 				dumphex(msg->traffic->data,msg->traffic->dsize);
 			}
@@ -112,7 +112,7 @@ int pop_message() {
 		if(msg->traffic != NULL && msg->traffic->signature != NULL) {
 			// Create the log file name
 			if(CONFIG_LOG_PACKET == 1) {
-				snprintf(logfile,128,"%s/%s.%d.dump",CONFIG_LOGDIR,inet_ntoa(msg->traffic->iphdr->ip_dst),msg->traffic->signature->sid);
+				snprintf(logfile,LOG_MAX_FILENAME,"%s/%s.%d.dump",CONFIG_LOGDIR,inet_ntoa(msg->traffic->iphdr->ip_dst),msg->traffic->signature->sid);
 				traffic_to_file(logfile,msg->traffic);
 			}
 		}
@@ -136,17 +136,6 @@ void fatal_error(char *string, ...) {
 	exit(1);
 }
 
-void log_verbose(char *string, ...) {
-
-        va_list ap;
-	if(CONFIG_LOG_VERBOSE==0)
-		return;
-
-        va_start(ap, string);
-	push_message(LOG_TYPE_VERBOSE,string,ap,NULL);
-	stats_increase_cnt(CNT_LOG_TYPE_VERBOSE,1);
-}
-
 void log_error(char *string, ...) {
         va_list ap;
         va_start(ap, string);
@@ -159,6 +148,19 @@ void log_info(char *string, ...) {
         va_start(ap, string);
 	push_message(LOG_TYPE_INFO,string,ap,NULL);
 	stats_increase_cnt(CNT_LOG_TYPE_INFO,1);
+}
+
+void log_verbose(int level, char *string, ...) {
+        va_list ap;
+
+	// If verbosity is not this high then
+	// dont print the message.. just bail out
+	if(level > CONFIG_LOG_VERBOSE)
+		return;
+
+        va_start(ap, string);
+        push_message(LOG_TYPE_VERBOSE,string,ap,NULL);
+        stats_increase_cnt(CNT_LOG_TYPE_VERBOSE,1);
 }
 
 void log_alert(struct traffic *traf,char *string, ...) {

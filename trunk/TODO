@@ -26,9 +26,7 @@ Todo
 - Implement support of multiple analyzers to take advantage of SMP
 - Get rid of strdup's
 - Reloading of signatures: freeMem the allocated content strings (and uricontent)
-- amount of packets
 - detect_hooks: add protocol check in the options function and prevent loading if the protocol is not OK
-- sigcount cleanup
 
 
 

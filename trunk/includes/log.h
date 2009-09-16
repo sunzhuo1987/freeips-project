@@ -22,6 +22,11 @@ struct logfilestruct logoutputs[LOG_FILE_NAME_CNT];
 #define LOG_TYPE_ALL  6
 #define LOG_TYPE_OTHER  7
 #define LOG_MAX_SIZE   1024
+#define LOG_MAX_FILENAME	128
+
+#define VERBOSE_LEVEL1 1
+#define VERBOSE_LEVEL2 2
+#define VERBOSE_LEVEL3 3
 
 typedef struct message {
         char msg[LOG_MAX_SIZE];
@@ -36,11 +41,12 @@ void pop_all_messages();
 void log_info(char *string, ...); 
 void do_log(Message *msg);
 void log_error(char *string, ...); 
-void log_verbose(char *string, ...); 
 void log_alert(struct traffic *traf, char *string, ...); 
 void alert(struct signature* sig, struct traffic* traffic );
 void log_warn(char *string, ...);
 void fatal_error(char *string, ...);
+void log_verbose(int level, char *string, ...);
+
 void logoutputs_init();
 void logoutputs_close();
 

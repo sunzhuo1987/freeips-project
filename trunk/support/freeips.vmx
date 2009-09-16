@@ -3,7 +3,7 @@ displayName = "FreeBSD"
 guestOS = "freebsd"
 
 memsize = "256"
-ide0:0.fileName = "ANTI.vmdk"
+ide0:0.fileName = "FreeIPS.vmdk"
 #ide1:0.fileName = "cdrom.iso"
 
 # DEFAULT SETTINGS UNDER THIS LINE

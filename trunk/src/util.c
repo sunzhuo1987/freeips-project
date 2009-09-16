@@ -157,7 +157,7 @@ void dumphex(void *data, int size) {
 void usage() {
 	printf("\n\n");
 	printf("\n------------------------------------------------------\n");
-	printf("                     %s (version: %s)\n",PROGNAME, VERSION);
+	printf("                     %s (version: %s %s)\n",PROGNAME, VERSION);
 	printf("------------------------------------------------------\n");
 	printf("\n");
 	printf("Options:\n");

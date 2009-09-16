@@ -99,7 +99,7 @@ void dump_stats(FILE *fd) {
 
 
 	fprintf(fd,"\n--------------------------------------\n");
-	fprintf(fd,"            IDS STATISTICS\n");
+	fprintf(fd,"            FreeIPS STATISTICS\n");
 	fprintf(fd,"--------------------------------------\n");
 	fprintf(fd,"IP                %d\n",stat_get(CNT_IP));
 	fprintf(fd,"IP Error          %d\n",stat_get(CNT_IP_ERR));

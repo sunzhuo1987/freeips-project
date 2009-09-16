@@ -20,7 +20,7 @@
   </general>
 
   <logging>
-	<verbosity>1</verbosity>
+	<verbosity>0</verbosity>
 	<syslog>0</syslog>
 	<stdout>1</stdout>
 	<showtraffic>0</showtraffic>

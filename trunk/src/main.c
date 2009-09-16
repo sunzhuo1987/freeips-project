@@ -34,7 +34,6 @@ int loop_sniffer  = 1;
 int loop_analyzer = 1;
 int loop_main	  = 1;
 int mode_offline  = 0;
-extern int sigcount;
 
 struct timeval startuptime;
 pcap_t *handle = NULL;
@@ -147,7 +146,7 @@ int main(int argc, char **argv)  {
 	timer_register_function(CONFIG_TIMER_IPFRAG_CLEANER,"IP fragment cleaner", ip_frag_cleaner,NULL);
 
 	//Load the signatures
-	if(load_signatures(CONFIG_SIGFILE) == -1){
+	if(load_signatures(CONFIG_SIGFILE) == 1){
 		usage();
 		exit(1);
 	}
