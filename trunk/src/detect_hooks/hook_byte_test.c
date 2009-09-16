@@ -40,7 +40,6 @@ int hook_byte_test(struct signature *sig,struct traffic *traffic) {
 
 	pptr = (char *)traffic->payload;
 
-        // Find a slot to put the content struct into
         for(index=0;index<SIG_MAX_BYTETEST;index++) {
                 if(sig->byte_test[index] != NULL) {
 			bptr = sig->byte_test[index];

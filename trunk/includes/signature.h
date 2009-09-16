@@ -131,9 +131,6 @@ struct signature {
 	int dsize_type;
 	int dsize;
 
-	// Latency
-	int latency;
-
 	// Detection hook
         DetectHook *DetectHooks[DETECT_HOOK_MAX_CNT];
 

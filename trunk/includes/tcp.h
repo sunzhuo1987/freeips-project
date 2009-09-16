@@ -20,7 +20,6 @@ typedef struct tcp_session {
 	struct timeval starttime;
 	struct timeval seentime;
 	struct p0f_response *p0f;
-	int latency;
 	int timeout;
 	int state;
 

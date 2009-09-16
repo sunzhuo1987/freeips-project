@@ -57,10 +57,8 @@ void detect_hook_init() {
 	detect_hook_register("ip_proto"  ,0, HOOK_PRIO_HIGH,   hook_ip_proto,hook_ip_proto_options);
 	detect_hook_register("p0f"       ,0, HOOK_PRIO_LOW,    hook_p0f,hook_p0f_options);
 	detect_hook_register("dsize"     ,0, HOOK_PRIO_HIGH,   hook_dsize,hook_dsize_options);
-	detect_hook_register("socom"     ,0, HOOK_PRIO_LOW,    hook_socom,hook_socom_options);
 	detect_hook_register("flags"     ,0, HOOK_PRIO_HIGH,   hook_tcp_flags,hook_tcp_flags_options);
 	detect_hook_register("uricontent",0, HOOK_PRIO_LOW,    hook_uricontent,hook_uricontent_options);
-	detect_hook_register("latency"   ,0, HOOK_PRIO_LOW,    hook_latency,hook_latency_options);
 	detect_hook_register("seq"       ,0, HOOK_PRIO_HIGH,   hook_tcp_seq,hook_tcp_seq_options);
 	detect_hook_register("ack"       ,0, HOOK_PRIO_HIGH,   hook_tcp_ack,hook_tcp_ack_options);
 	detect_hook_register("itype"     ,0, HOOK_PRIO_HIGH,   hook_icmp_itype,hook_icmp_itype_options);

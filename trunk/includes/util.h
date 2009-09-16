@@ -88,8 +88,6 @@
 #include <hook_ip_proto.h>
 #include <hook_p0f.h>
 #include <hook_dsize.h>
-#include <hook_socom.h>
-#include <hook_latency.h>
 #include <hook_icmp_itype.h>
 #include <hook_icmp_icode.h>
 #include <hook_byte_test.h>

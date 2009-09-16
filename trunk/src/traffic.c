@@ -101,7 +101,6 @@ struct traffic * pcap_to_traffic(void *packet, const struct pcap_pkthdr* pkthdr)
         traffic->signature = NULL;
         traffic->tcphdr    = NULL;
         traffic->udphdr    = NULL;
-        traffic->latency   = 0;
 	traffic->poffset   = 0; // for relative hook matching
         traffic->icmphdr = NULL;
 
@@ -145,7 +144,6 @@ struct traffic * divert_to_traffic(void *packet, int psize) {
         traffic->tcphdr    = NULL;
         traffic->udphdr    = NULL;
 	traffic->poffset   = 0; // for relative hook matching
-        traffic->latency   = 0;
         traffic->icmphdr = NULL;
 
 	traffic->http_uri = NULL;
